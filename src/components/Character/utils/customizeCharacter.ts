@@ -5,16 +5,13 @@ import * as THREE from "three";
  * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
  * 2. Solid matte black crewneck T-shirt (ao thun den)
  * 3. Clean natural original haircut (bo luon mai di)
- * 4. Original animated eyes from GLTF model (doi mat cu)
- * 5. Realistic human-proportioned ears (completely hides cartoon dumbo ears)
- * 6. Fashionable oversized clear acetate glasses:
- *    - Oversized Pantos / Wellington shape (soft curved rounded bottom, never boxy/square)
- *    - Translucent clear crystal acetate frame with glossy reflections and silver rivets
+ * 4. Original animated eyes from GLTF model
+ * 5. Realistic human-proportioned ears
+ * 6. Fashionable oversized clear acetate glasses with silver rivets
  * 7. Polished sterling silver hoop earrings:
- *    - Left ear: 1st lobe, 2nd lobe, and conch
+ *    - Left ear: 1st lobe, 2nd lobe, and snug outer-rim conch hoop
  *    - Right ear: 1st lobe
- * 8. Golden blonde mullet nape hair (gay toc dai mau vang):
- *    - Layers cascading down the neck and flaring prominently around jaw and collar
+ * 8. Lush, dense, layered golden blonde mullet nape hair (gay mullet vang day dan, soi min tu nhien)
  */
 export function customizeCharacter(character: THREE.Object3D) {
   // 1. Color palette tailored to user's photo
@@ -25,7 +22,7 @@ export function customizeCharacter(character: THREE.Object3D) {
   const browColor = new THREE.Color("#1c1a22"); // Refined natural dark eyebrows
   const pantsColor = new THREE.Color("#18171f"); // Dark denim pants
 
-  // 2. Refine eyebrow bones (make them sleek and natural)
+  // 2. Refine eyebrow bones (sleek and natural)
   const browL = character.getObjectByName("eyebrow_L");
   if (browL) browL.scale.set(0.70, 0.55, 0.70);
   const browR = character.getObjectByName("eyebrow_R");
@@ -49,7 +46,7 @@ export function customizeCharacter(character: THREE.Object3D) {
           roughness: 0.44,
           metalness: 0.0,
           emissive: skinEmissive,
-          emissiveIntensity: 0.20, // Radiant fair skin that keeps 3D nose, lips, and jaw shadows visible
+          emissiveIntensity: 0.20,
         });
       } else if (name.includes("Ear")) {
         // Completely hide the cartoon dumbo ears!
@@ -79,7 +76,6 @@ export function customizeCharacter(character: THREE.Object3D) {
           metalness: 0.02,
         });
       }
-      // Eyes are kept with their original material and texture from the 3D model
     }
   });
 
@@ -101,7 +97,7 @@ export function customizeCharacter(character: THREE.Object3D) {
   const earrings = createEarrings();
   headBone.add(earrings);
 
-  // Add golden blonde mullet nape hair (gay vang)
+  // Add dense, layered golden blonde mullet nape hair (gay vang day dan)
   const blondeNape = createBlondeMulletNape();
   headBone.add(blondeNape);
 }
@@ -109,7 +105,7 @@ export function customizeCharacter(character: THREE.Object3D) {
 /**
  * Creates realistic human-proportioned ears positioned naturally on the sides of the head.
  * In spine006 coordinates: Head sides sit at x = +-0.98.
- * Realistic ears extend outward gently to +-1.16 (natural human width).
+ * Outer helix ridge runs vertically at x = +-1.15, z = 0.23, y = 0.86 to 1.25.
  */
 function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color): THREE.Group {
   const group = new THREE.Group();
@@ -337,10 +333,12 @@ function createOversizedGlasses(): THREE.Group {
 
 /**
  * Creates silver hoop earrings matching user's exact specification:
- * - Tai trái: 1st lobe, 2nd lobe, và conch
- * - Tai phải: 1st lobe
- * Note: Positioned precisely on the realistic ear anatomy (x = +-1.02 to +-1.09)
- * so they are prominently visible from front and 3/4 view!
+ * - Tai trái:
+ *   1. 1st lobe: dưới cùng dái tai
+ *   2. 2nd lobe: trên 1st lobe dọc vành dái tai
+ *   3. Conch: nhỏ gọn, đẩy sát ra ngoài bo tròn ôm khít phần viền tai nhô lên (theo đúng ảnh mẫu media_1791023980600.png)
+ * - Tai phải:
+ *   1. 1st lobe: dưới cùng dái tai
  */
 function createEarrings(): THREE.Group {
   const group = new THREE.Group();
@@ -372,10 +370,11 @@ function createEarrings(): THREE.Group {
   left2ndLobe.rotation.set(0.10, 1.45, 0.15);
   group.add(left2ndLobe);
 
-  // 3. Left Conch (vòng sụn conch ôm qua vành tai giữa vào lòng tai chuẩn theo ảnh)
-  const leftConch = makeHoop(0.074, 0.013);
-  leftConch.position.set(1.10, 1.00, 0.25);
-  leftConch.rotation.set(Math.PI / 2 - 0.22, 0.18, -0.32);
+  // 3. Left Conch: Nhỏ hơn (radius 0.046, tube 0.009), đẩy sát ra ngoài (x = 1.138, z = 0.232)
+  // ôm tròn khít phần viền tai nhô lên chuẩn theo ảnh media_1791023980600.png
+  const leftConch = makeHoop(0.046, 0.009);
+  leftConch.position.set(1.138, 0.99, 0.232);
+  leftConch.rotation.set(Math.PI / 2 - 0.16, 0.15, -0.22);
   group.add(leftConch);
 
   // --- TAI PHẢI (RIGHT EAR, x < 0) ---
@@ -389,28 +388,36 @@ function createEarrings(): THREE.Group {
 }
 
 /**
- * Creates golden blonde mullet nape hair locks:
- * - Extends down the back of the neck and drapes over the black T-shirt collar
- * - Flares out prominently below the ears so it is clearly visible from the front view
+ * Creates lush, layered, fine-stranded golden blonde mullet nape hair:
+ * - Natural, dense texture with multiple fine strands (not giant chunky tubes)
+ * - Layered feathered flow cascading down the back of the neck and shoulders (theo anh media_1791023945330.png)
+ * - Peeks out gracefully around the jaw/neck with subtle flicked tips
  */
 function createBlondeMulletNape(): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangBlondeNape";
 
+  // Multi-tonal natural blonde palette
   const goldenBlonde = new THREE.MeshStandardMaterial({
-    color: "#f5c538",
-    roughness: 0.55,
+    color: "#edbe3b", // Primary warm golden blonde
+    roughness: 0.54,
     metalness: 0.08,
   });
 
   const sunlitBlonde = new THREE.MeshStandardMaterial({
-    color: "#ffd966",
+    color: "#fad86b", // Bright sunlit blonde highlight
     roughness: 0.50,
     metalness: 0.10,
   });
 
+  const lightWheatBlonde = new THREE.MeshStandardMaterial({
+    color: "#fae79d", // Light champagne feathered tip highlight
+    roughness: 0.48,
+    metalness: 0.08,
+  });
+
   const richHoneyBlonde = new THREE.MeshStandardMaterial({
-    color: "#df9e24",
+    color: "#cf9223", // Rich amber/honey undertone for volume depth
     roughness: 0.60,
     metalness: 0.06,
   });
@@ -421,95 +428,215 @@ function createBlondeMulletNape(): THREE.Group {
     material: THREE.Material
   ) {
     const curve = new THREE.CatmullRomCurve3(points);
-    const geom = new THREE.TubeGeometry(curve, 20, radius, 8, false);
+    const geom = new THREE.TubeGeometry(curve, 18, radius, 8, false);
     return new THREE.Mesh(geom, material);
   }
 
-  // 1. Visible Side Flared Wings (peeking out prominently around jaw/ears, seen from front!)
-  // Left side wings:
+  // --- 1. LEFT SIDE FLOWERING MULLET WAVES (Fine, layered, dense) ---
+  // Outer layer: soft feathered tips peeking out around jaw/ears
   group.add(makeLock([
-    new THREE.Vector3(0.55, 0.90, -0.06),
-    new THREE.Vector3(0.72, 0.60, -0.14),
-    new THREE.Vector3(0.80, 0.28, -0.22),
-    new THREE.Vector3(0.76, -0.08, -0.30),
-    new THREE.Vector3(0.66, -0.32, -0.36),
-  ], 0.088, sunlitBlonde));
+    new THREE.Vector3(0.58, 0.85, -0.12),
+    new THREE.Vector3(0.68, 0.56, -0.19),
+    new THREE.Vector3(0.74, 0.26, -0.25),
+    new THREE.Vector3(0.72, -0.04, -0.29),
+    new THREE.Vector3(0.66, -0.26, -0.30),
+  ], 0.028, sunlitBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.48, 0.85, -0.14),
-    new THREE.Vector3(0.66, 0.54, -0.22),
-    new THREE.Vector3(0.76, 0.20, -0.30),
-    new THREE.Vector3(0.72, -0.16, -0.38),
-  ], 0.082, goldenBlonde));
+    new THREE.Vector3(0.52, 0.88, -0.16),
+    new THREE.Vector3(0.64, 0.58, -0.23),
+    new THREE.Vector3(0.72, 0.28, -0.28),
+    new THREE.Vector3(0.73, 0.00, -0.31),
+    new THREE.Vector3(0.69, -0.24, -0.31),
+  ], 0.030, lightWheatBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.60, 0.76, -0.10),
-    new THREE.Vector3(0.78, 0.44, -0.18),
-    new THREE.Vector3(0.84, 0.12, -0.26),
-    new THREE.Vector3(0.78, -0.22, -0.34),
-  ], 0.076, richHoneyBlonde));
-
-  // Right side wings:
-  group.add(makeLock([
-    new THREE.Vector3(-0.55, 0.90, -0.06),
-    new THREE.Vector3(-0.72, 0.60, -0.14),
-    new THREE.Vector3(-0.80, 0.28, -0.22),
-    new THREE.Vector3(-0.76, -0.08, -0.30),
-    new THREE.Vector3(-0.66, -0.32, -0.36),
-  ], 0.088, sunlitBlonde));
+    new THREE.Vector3(0.55, 0.78, -0.14),
+    new THREE.Vector3(0.66, 0.48, -0.22),
+    new THREE.Vector3(0.73, 0.18, -0.26),
+    new THREE.Vector3(0.70, -0.10, -0.30),
+    new THREE.Vector3(0.63, -0.30, -0.28),
+  ], 0.026, goldenBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.48, 0.85, -0.14),
-    new THREE.Vector3(-0.66, 0.54, -0.22),
-    new THREE.Vector3(-0.76, 0.20, -0.30),
-    new THREE.Vector3(-0.72, -0.16, -0.38),
-  ], 0.082, goldenBlonde));
+    new THREE.Vector3(0.48, 0.82, -0.20),
+    new THREE.Vector3(0.60, 0.52, -0.26),
+    new THREE.Vector3(0.67, 0.22, -0.30),
+    new THREE.Vector3(0.66, -0.08, -0.32),
+    new THREE.Vector3(0.59, -0.28, -0.30),
+  ], 0.030, sunlitBlonde));
+
+  // Mid-layer: lush wavy body giving dense volume
+  group.add(makeLock([
+    new THREE.Vector3(0.42, 0.86, -0.28),
+    new THREE.Vector3(0.52, 0.56, -0.34),
+    new THREE.Vector3(0.60, 0.24, -0.38),
+    new THREE.Vector3(0.59, -0.10, -0.38),
+    new THREE.Vector3(0.53, -0.30, -0.36),
+  ], 0.032, goldenBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.60, 0.76, -0.10),
-    new THREE.Vector3(-0.78, 0.44, -0.18),
-    new THREE.Vector3(-0.84, 0.12, -0.26),
-    new THREE.Vector3(-0.78, -0.22, -0.34),
-  ], 0.076, richHoneyBlonde));
-
-  // 2. Full Nape Waterfall Locks (covering back of neck and draping over collar)
-  group.add(makeLock([
-    new THREE.Vector3(0.00, 0.90, -0.55),
-    new THREE.Vector3(0.00, 0.55, -0.66),
-    new THREE.Vector3(0.00, 0.18, -0.72),
-    new THREE.Vector3(0.00, -0.22, -0.70),
-    new THREE.Vector3(0.00, -0.45, -0.64),
-  ], 0.092, sunlitBlonde));
+    new THREE.Vector3(0.49, 0.80, -0.26),
+    new THREE.Vector3(0.59, 0.50, -0.32),
+    new THREE.Vector3(0.65, 0.18, -0.36),
+    new THREE.Vector3(0.63, -0.14, -0.36),
+    new THREE.Vector3(0.56, -0.32, -0.34),
+  ], 0.030, richHoneyBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.12, 0.85, -0.54),
-    new THREE.Vector3(0.15, 0.50, -0.64),
-    new THREE.Vector3(0.16, 0.12, -0.70),
-    new THREE.Vector3(0.14, -0.25, -0.68),
-    new THREE.Vector3(0.10, -0.48, -0.62),
-  ], 0.086, goldenBlonde));
+    new THREE.Vector3(0.36, 0.88, -0.36),
+    new THREE.Vector3(0.46, 0.58, -0.42),
+    new THREE.Vector3(0.52, 0.26, -0.46),
+    new THREE.Vector3(0.50, -0.10, -0.44),
+    new THREE.Vector3(0.44, -0.32, -0.40),
+  ], 0.034, sunlitBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.12, 0.85, -0.54),
-    new THREE.Vector3(-0.15, 0.50, -0.64),
-    new THREE.Vector3(-0.16, 0.12, -0.70),
-    new THREE.Vector3(-0.14, -0.25, -0.68),
-    new THREE.Vector3(-0.10, -0.48, -0.62),
-  ], 0.086, goldenBlonde));
+    new THREE.Vector3(0.43, 0.76, -0.33),
+    new THREE.Vector3(0.53, 0.46, -0.38),
+    new THREE.Vector3(0.57, 0.14, -0.42),
+    new THREE.Vector3(0.53, -0.16, -0.42),
+    new THREE.Vector3(0.47, -0.34, -0.38),
+  ], 0.030, lightWheatBlonde));
+
+  // Inner layer: deep neck coverage
+  group.add(makeLock([
+    new THREE.Vector3(0.30, 0.85, -0.40),
+    new THREE.Vector3(0.38, 0.54, -0.46),
+    new THREE.Vector3(0.43, 0.22, -0.50),
+    new THREE.Vector3(0.41, -0.12, -0.48),
+    new THREE.Vector3(0.35, -0.32, -0.44),
+  ], 0.034, richHoneyBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.26, 0.80, -0.50),
-    new THREE.Vector3(0.30, 0.44, -0.60),
-    new THREE.Vector3(0.32, 0.08, -0.66),
-    new THREE.Vector3(0.28, -0.28, -0.62),
-  ], 0.080, richHoneyBlonde));
+    new THREE.Vector3(0.24, 0.82, -0.44),
+    new THREE.Vector3(0.31, 0.50, -0.50),
+    new THREE.Vector3(0.35, 0.18, -0.53),
+    new THREE.Vector3(0.33, -0.14, -0.50),
+    new THREE.Vector3(0.27, -0.33, -0.46),
+  ], 0.032, goldenBlonde));
+
+  // --- 2. RIGHT SIDE FLOWERING MULLET WAVES (Mirrored, fine, dense) ---
+  group.add(makeLock([
+    new THREE.Vector3(-0.58, 0.85, -0.12),
+    new THREE.Vector3(-0.68, 0.56, -0.19),
+    new THREE.Vector3(-0.74, 0.26, -0.25),
+    new THREE.Vector3(-0.72, -0.04, -0.29),
+    new THREE.Vector3(-0.66, -0.26, -0.30),
+  ], 0.028, sunlitBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.26, 0.80, -0.50),
-    new THREE.Vector3(-0.30, 0.44, -0.60),
-    new THREE.Vector3(-0.32, 0.08, -0.66),
-    new THREE.Vector3(-0.28, -0.28, -0.62),
-  ], 0.080, richHoneyBlonde));
+    new THREE.Vector3(-0.52, 0.88, -0.16),
+    new THREE.Vector3(-0.64, 0.58, -0.23),
+    new THREE.Vector3(-0.72, 0.28, -0.28),
+    new THREE.Vector3(-0.73, 0.00, -0.31),
+    new THREE.Vector3(-0.69, -0.24, -0.31),
+  ], 0.030, lightWheatBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.55, 0.78, -0.14),
+    new THREE.Vector3(-0.66, 0.48, -0.22),
+    new THREE.Vector3(-0.73, 0.18, -0.26),
+    new THREE.Vector3(-0.70, -0.10, -0.30),
+    new THREE.Vector3(-0.63, -0.30, -0.28),
+  ], 0.026, goldenBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.48, 0.82, -0.20),
+    new THREE.Vector3(-0.60, 0.52, -0.26),
+    new THREE.Vector3(-0.67, 0.22, -0.30),
+    new THREE.Vector3(-0.66, -0.08, -0.32),
+    new THREE.Vector3(-0.59, -0.28, -0.30),
+  ], 0.030, sunlitBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.42, 0.86, -0.28),
+    new THREE.Vector3(-0.52, 0.56, -0.34),
+    new THREE.Vector3(-0.60, 0.24, -0.38),
+    new THREE.Vector3(-0.59, -0.10, -0.38),
+    new THREE.Vector3(-0.53, -0.30, -0.36),
+  ], 0.032, goldenBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.49, 0.80, -0.26),
+    new THREE.Vector3(-0.59, 0.50, -0.32),
+    new THREE.Vector3(-0.65, 0.18, -0.36),
+    new THREE.Vector3(-0.63, -0.14, -0.36),
+    new THREE.Vector3(-0.56, -0.32, -0.34),
+  ], 0.030, richHoneyBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.36, 0.88, -0.36),
+    new THREE.Vector3(-0.46, 0.58, -0.42),
+    new THREE.Vector3(-0.52, 0.26, -0.46),
+    new THREE.Vector3(-0.50, -0.10, -0.44),
+    new THREE.Vector3(-0.44, -0.32, -0.40),
+  ], 0.034, sunlitBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.43, 0.76, -0.33),
+    new THREE.Vector3(-0.53, 0.46, -0.38),
+    new THREE.Vector3(-0.57, 0.14, -0.42),
+    new THREE.Vector3(-0.53, -0.16, -0.42),
+    new THREE.Vector3(-0.47, -0.34, -0.38),
+  ], 0.030, lightWheatBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.30, 0.85, -0.40),
+    new THREE.Vector3(-0.38, 0.54, -0.46),
+    new THREE.Vector3(-0.43, 0.22, -0.50),
+    new THREE.Vector3(-0.41, -0.12, -0.48),
+    new THREE.Vector3(-0.35, -0.32, -0.44),
+  ], 0.034, richHoneyBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.24, 0.82, -0.44),
+    new THREE.Vector3(-0.31, 0.50, -0.50),
+    new THREE.Vector3(-0.35, 0.18, -0.53),
+    new THREE.Vector3(-0.33, -0.14, -0.50),
+    new THREE.Vector3(-0.27, -0.33, -0.46),
+  ], 0.032, goldenBlonde));
+
+  // --- 3. CENTER WATERFALL CASCADING DOWN NAPE & COLLAR ---
+  group.add(makeLock([
+    new THREE.Vector3(0.00, 0.92, -0.48),
+    new THREE.Vector3(0.00, 0.60, -0.56),
+    new THREE.Vector3(0.00, 0.25, -0.62),
+    new THREE.Vector3(0.00, -0.14, -0.60),
+    new THREE.Vector3(0.00, -0.36, -0.54),
+  ], 0.036, sunlitBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(0.07, 0.90, -0.47),
+    new THREE.Vector3(0.09, 0.58, -0.55),
+    new THREE.Vector3(0.10, 0.22, -0.61),
+    new THREE.Vector3(0.09, -0.15, -0.59),
+    new THREE.Vector3(0.06, -0.37, -0.53),
+  ], 0.034, goldenBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.07, 0.90, -0.47),
+    new THREE.Vector3(-0.09, 0.58, -0.55),
+    new THREE.Vector3(-0.10, 0.22, -0.61),
+    new THREE.Vector3(-0.09, -0.15, -0.59),
+    new THREE.Vector3(-0.06, -0.37, -0.53),
+  ], 0.034, goldenBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(0.14, 0.87, -0.46),
+    new THREE.Vector3(0.18, 0.54, -0.53),
+    new THREE.Vector3(0.20, 0.18, -0.58),
+    new THREE.Vector3(0.18, -0.16, -0.56),
+    new THREE.Vector3(0.13, -0.36, -0.50),
+  ], 0.032, richHoneyBlonde));
+
+  group.add(makeLock([
+    new THREE.Vector3(-0.14, 0.87, -0.46),
+    new THREE.Vector3(-0.18, 0.54, -0.53),
+    new THREE.Vector3(-0.20, 0.18, -0.58),
+    new THREE.Vector3(-0.18, -0.16, -0.56),
+    new THREE.Vector3(-0.13, -0.36, -0.50),
+  ], 0.032, richHoneyBlonde));
 
   return group;
 }
