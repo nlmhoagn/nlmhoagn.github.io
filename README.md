@@ -1,28 +1,30 @@
-# Nguyen Le Minh Hoang — Portfolio Website 🚀
+# Hoang Nguyen — Portfolio Website
 
-Interactive 3D Portfolio website of **Nguyen Le Minh Hoang (Nguyễn Lê Minh Hoàng)**, Computer Engineering undergraduate at Ho Chi Minh City University of Technology (HCMUT - VNU-HCM).
+Personal interactive 3D portfolio website of **Hoang Nguyen (Nguyen Le Minh Hoang)**, Computer Engineering undergraduate at Ho Chi Minh City University of Technology (HCMUT - VNU-HCM).
 
-Specialized in **Edge AI**, **Computer Vision**, **Multimodal Video & Document Retrieval**, and **Embedded Systems**.
+- Live Website: [nlmhoagn.github.io](https://nlmhoagn.github.io/)
 
----
-
-## 👨‍💻 About Me
-
-- 🎓 **Education:** Ho Chi Minh City University of Technology (HCMUT - VNU-HCM) (2025–2029)
-  - **Major:** Computer Engineering
-  - **Cumulative GPA:** 4.00 / 4.00 (9.33 / 10.00)
-  - **Scholarship:** Academic Encouragement Scholarship (Tier 1), Semester 1, AY 2025–2026
-- 🏫 **High School:** High School for the Gifted (PTNK - Vietnam National University HCM) (2022–2025)
-- 📍 **Location:** Ho Chi Minh City, Vietnam
-- 📧 **Email:** [hoang.nguyen102@hcmut.edu.vn](mailto:hoang.nguyen102@hcmut.edu.vn)
-- 🐙 **GitHub:** [@nlmhoagn](https://github.com/nlmhoagn)
+Specialized in Edge AI, Computer Vision, Multimodal Video & Document Retrieval, and Embedded Systems.
 
 ---
 
-## 🏆 Highlighted Projects & Competitions
+## About Me
+
+- **Education:** Ho Chi Minh City University of Technology (HCMUT - VNU-HCM) (2025–2029)
+  - Major: Computer Engineering
+  - Cumulative GPA: 4.00 / 4.00 (9.33 / 10.00)
+  - Scholarship: Academic Encouragement Scholarship (Tier 1), Semester 1, AY 2025–2026
+- **High School:** High School for the Gifted (PTNK - Vietnam National University HCM) (2022–2025)
+- **Location:** Ho Chi Minh City, Vietnam
+- **Email:** [hoang.nguyen102@hcmut.edu.vn](mailto:hoang.nguyen102@hcmut.edu.vn)
+- **GitHub:** [@nlmhoagn](https://github.com/nlmhoagn)
+
+---
+
+## Highlighted Projects & Competitions
 
 1. **Solar-Powered Emergency-Lane Monitoring — ACLAB (2026)**
-   - *Role:* Project Collaborator
+   - Role: Project Collaborator
    - Real-time stopped-vehicle detection in highway emergency lanes activating LED warning alerts.
    - Built on a Kendryte K230 edge AI board with YOLO detection, lane-region filtering, and multi-vehicle tracking.
 
@@ -44,68 +46,16 @@ Specialized in **Edge AI**, **Computer Vision**, **Multimodal Video & Document R
 
 ---
 
-## 🛠️ Tech Stack & Skills
+## Tech Stack & Skills
 
 - **Languages:** Python, C / C++, TypeScript, JavaScript, HTML5, CSS3
 - **Deep Learning & CV:** PyTorch, Transformers, YOLO, CLIP / SigLIP, OpenCV, TinyML
 - **Retrieval & Speech:** Milvus Vector DB, BM25, Cross-Encoder, ASR, OCR
 - **Embedded & Hardware:** Kendryte K230 Edge AI, ESP32-S3, Kalman Filtering, OTA
-- **Web & Graphics:** React 18, Three.js, React Three Fiber, React Three Rapier (Physics), GSAP, Vite
+- **Web & Graphics:** React 18, Three.js, React Three Fiber, React Three Rapier (Physics), GSAP, Lenis, Vite
 
 ---
 
-## 🚀 Getting Started Locally
+## License & Credits
 
-### Prerequisites
-- Node.js (v18+ recommended)
-- npm or yarn / pnpm
-
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/nlmhoagn/Portfolio-Website.git
-cd Portfolio-Website
-
-# 2. Install dependencies
-npm install
-
-# 3. Run development server
-npm run dev
-```
-
-Visit `http://localhost:5173` in your browser.
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-The production assets will be generated in the `dist/` directory.
-
----
-
-## 🌐 Deploying to GitHub Pages
-
-This project is configured with relative base paths (`./`) in `vite.config.ts`, making it deployable directly to GitHub Pages or any static host.
-
-### Option 1: Automated GitHub Actions (Recommended)
-This repo includes `.github/workflows/deploy.yml` which automatically builds and publishes the website to GitHub Pages whenever you push to the `main` branch.
-
-In your GitHub repository settings:
-1. Go to **Settings** > **Pages**.
-2. Under **Build and deployment** > **Source**, choose **GitHub Actions**.
-3. Push to `main`, and your portfolio will be live at `https://nlmhoagn.github.io/Portfolio-Website/`!
-
-### Option 2: Deploying via gh-pages
-```bash
-npm run build
-npx gh-pages -d dist
-```
-
----
-
-## 📄 License & Credits
-- Portfolio content and project achievements © 2026 **Nguyen Le Minh Hoang**.
-- 3D Interactive WebGL template design inspired by Moncy Yohannan.
+- Portfolio content and project achievements (c) 2026 **Hoang Nguyen (Nguyen Le Minh Hoang)**. All rights reserved.
