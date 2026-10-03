@@ -11,7 +11,8 @@ const BASE_URL = import.meta.env.BASE_URL.endsWith("/")
 const setCharacter = (
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
-  camera: THREE.PerspectiveCamera
+  camera: THREE.PerspectiveCamera,
+  envPromise?: Promise<THREE.DataTexture | null>
 ) => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
@@ -45,7 +46,10 @@ const setCharacter = (
                 mesh.frustumCulled = true;
               }
             });
-            // Fully compile shaders and pre-warm GPU buffers
+            if (envPromise) {
+              await envPromise.catch(() => null);
+            }
+            // Fully compile shaders and pre-warm GPU buffers with environment map
             renderer.compile(scene, camera);
             renderer.render(scene, camera);
             resolve(gltf);

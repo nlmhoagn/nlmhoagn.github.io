@@ -51,7 +51,12 @@ export class ScrollSmoother {
         if (target) {
           this.resizeObserver.observe(target);
         }
+        if (document.body && document.body !== target) {
+          this.resizeObserver.observe(document.body);
+        }
       }
+
+      (window as unknown as { smoother: ScrollSmoother }).smoother = this;
     }
   }
 

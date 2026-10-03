@@ -1,56 +1,54 @@
 import * as THREE from "three";
 import { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
 import {
   BallCollider,
   Physics,
   RigidBody,
-  CylinderCollider,
   RapierRigidBody,
 } from "@react-three/rapier";
 import { ScrollSmoother } from "./utils/ScrollSmoother";
 
 function createTechBadgeTexture(name: string, color: string, sub: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
   // Background
   ctx.fillStyle = "#120e1c";
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   // Outer glowing ring
   ctx.save();
   ctx.shadowColor = color;
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 12;
   ctx.strokeStyle = color;
-  ctx.lineWidth = 14;
+  ctx.lineWidth = 8;
   ctx.beginPath();
-  ctx.arc(256, 256, 210, 0, Math.PI * 2);
+  ctx.arc(128, 128, 108, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 
   // Subtle inner accent circle
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+  ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.arc(256, 256, 180, 0, Math.PI * 2);
+  ctx.arc(128, 128, 92, 0, Math.PI * 2);
   ctx.stroke();
 
   // Tech Name
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 60px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(name, 256, 225);
+  ctx.font = "bold 32px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(name, 128, 112);
 
   // Subtitle/tag
   ctx.fillStyle = color;
-  ctx.font = "bold 26px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(sub, 256, 290);
+  ctx.font = "bold 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(sub, 128, 146);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
@@ -72,12 +70,11 @@ const techSkills = [
 
 const sphereGeometry = new THREE.SphereGeometry(1, 24, 24);
 
-const spheres = [...Array(18)].map(() => ({
-  scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
+const spheres = [...Array(12)].map(() => ({
+  scale: [0.75, 1, 0.85, 1, 0.95][Math.floor(Math.random() * 5)],
 }));
 
 type SphereProps = {
-  vec?: THREE.Vector3;
   scale: number;
   r?: typeof THREE.MathUtils.randFloatSpread;
   material: THREE.MeshPhysicalMaterial;
@@ -85,46 +82,37 @@ type SphereProps = {
 };
 
 function SphereGeo({
-  vec = new THREE.Vector3(),
   scale,
   r = THREE.MathUtils.randFloatSpread,
   material,
   isActive,
 }: SphereProps) {
   const api = useRef<RapierRigidBody | null>(null);
+  const vec = useRef(new THREE.Vector3());
 
   useFrame((_state, delta) => {
     if (!isActive || !api.current) return;
-    delta = Math.min(0.1, delta);
-    const impulse = vec
-      .copy(api.current.translation())
-      .normalize()
-      .multiply(
-        new THREE.Vector3(
-          -50 * delta * scale,
-          -150 * delta * scale,
-          -50 * delta * scale
-        )
-      );
+    delta = Math.min(0.05, delta);
+    const trans = api.current.translation();
+    vec.current.set(
+      trans.x * -50 * delta * scale,
+      trans.y * -140 * delta * scale,
+      trans.z * -50 * delta * scale
+    );
 
-    api.current.applyImpulse(impulse, true);
+    api.current.applyImpulse(vec.current, true);
   });
 
   return (
     <RigidBody
-      linearDamping={0.75}
-      angularDamping={0.15}
-      friction={0.2}
-      position={[r(20), r(20) - 25, r(20) - 10]}
+      linearDamping={0.8}
+      angularDamping={0.2}
+      friction={0.25}
+      position={[r(18), r(18) - 20, r(18) - 8]}
       ref={api}
       colliders={false}
     >
       <BallCollider args={[scale]} />
-      <CylinderCollider
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, 1.2 * scale]}
-        args={[0.15 * scale, 0.275 * scale]}
-      />
       <mesh
         castShadow
         receiveShadow
@@ -138,16 +126,16 @@ function SphereGeo({
 }
 
 type PointerProps = {
-  vec?: THREE.Vector3;
   isActive: boolean;
 };
 
-function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
+function Pointer({ isActive }: PointerProps) {
   const ref = useRef<RapierRigidBody>(null);
+  const vec = useRef(new THREE.Vector3());
 
   useFrame(({ pointer, viewport }) => {
     if (!isActive || !ref.current) return;
-    const targetVec = vec.lerp(
+    vec.current.lerp(
       new THREE.Vector3(
         (pointer.x * viewport.width) / 2,
         (pointer.y * viewport.height) / 2,
@@ -155,7 +143,7 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
       ),
       0.2
     );
-    ref.current.setNextKinematicTranslation(targetVec);
+    ref.current.setNextKinematicTranslation(vec.current);
   });
 
   return (
@@ -178,13 +166,13 @@ const TechStack = () => {
     ScrollSmoother.refresh();
     const timer = setTimeout(() => {
       ScrollSmoother.refresh();
-    }, 400);
+    }, 300);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsActive(entry.isIntersecting);
       },
-      { rootMargin: "250px" }
+      { rootMargin: "200px" }
     );
     if (techRef.current) {
       observer.observe(techRef.current);
@@ -195,10 +183,6 @@ const TechStack = () => {
     };
   }, []);
 
-  const BASE_URL = import.meta.env.BASE_URL.endsWith("/")
-    ? import.meta.env.BASE_URL
-    : import.meta.env.BASE_URL + "/";
-
   const materials = useMemo(() => {
     return techSkills.map((tech) => {
       const texture = createTechBadgeTexture(tech.name, tech.color, tech.sub);
@@ -206,9 +190,9 @@ const TechStack = () => {
         map: texture,
         emissive: "#ffffff",
         emissiveMap: texture,
-        emissiveIntensity: 0.25,
-        metalness: 0.6,
-        roughness: 0.8,
+        emissiveIntensity: 0.3,
+        metalness: 0.5,
+        roughness: 0.7,
         clearcoat: 0.2,
       });
     });
@@ -219,36 +203,41 @@ const TechStack = () => {
       <h2> My Techstack</h2>
 
       <Canvas
-        gl={{ alpha: true, stencil: false, depth: true, antialias: false, powerPreference: "high-performance" }}
+        eventSource={techRef as unknown as React.MutableRefObject<HTMLElement>}
+        gl={{
+          alpha: true,
+          stencil: false,
+          depth: true,
+          antialias: false,
+          powerPreference: "high-performance",
+        }}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
-        onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
+        onCreated={(state) => (state.gl.toneMappingExposure = 1.4)}
         className="tech-canvas"
-        style={{ touchAction: "pan-y" }}
+        style={{ pointerEvents: "none" }}
       >
-        <ambientLight intensity={1.2} />
+        <ambientLight intensity={1.5} />
         <spotLight
           position={[20, 20, 25]}
           penumbra={1}
-          angle={0.2}
-          color="white"
+          angle={0.25}
+          color="#ffffff"
+          intensity={2}
         />
-        <directionalLight position={[0, 5, -4]} intensity={2} />
+        <directionalLight position={[0, 5, -4]} intensity={2.5} />
+        <pointLight position={[-15, 10, 15]} color="#aa42ff" intensity={1.8} />
+        <pointLight position={[15, -10, 10]} color="#38bdf8" intensity={1.2} />
         <Physics gravity={[0, 0, 0]}>
           <Pointer isActive={isActive} />
           {spheres.map((props, i) => (
             <SphereGeo
               key={i}
               {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
+              material={materials[i % materials.length]}
               isActive={isActive}
             />
           ))}
         </Physics>
-        <Environment
-          files={`${BASE_URL}models/char_enviorment.hdr`}
-          environmentIntensity={0.5}
-          environmentRotation={[0, 4, 2]}
-        />
       </Canvas>
     </div>
   );

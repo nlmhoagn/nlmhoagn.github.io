@@ -45,7 +45,18 @@ const MainContainer = ({ children }: PropsWithChildren) => {
             <Career />
             {!PRIVACY_CONFIG.hideWork && <Work />}
             {isDesktopView && (
-              <Suspense fallback={<div>Loading....</div>}>
+              <Suspense
+                fallback={
+                  <div
+                    style={{
+                      height: "calc(var(--vh, 100vh))",
+                      minHeight: "720px",
+                      marginTop: "120px",
+                      marginBottom: "60px",
+                    }}
+                  />
+                }
+              >
                 <TechStack />
               </Suspense>
             )}

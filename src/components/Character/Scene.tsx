@@ -52,7 +52,7 @@ const Scene = () => {
 
       const light = setLighting(scene);
       const progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera);
+      const { loadCharacter } = setCharacter(renderer, scene, camera, light.envPromise);
 
       loadCharacter()
         .then((gltf) => {
@@ -144,7 +144,7 @@ const Scene = () => {
           );
           light.setPointLight(screenLight);
         }
-        const delta = Math.min(clock.getDelta(), 0.05);
+        const delta = Math.min(clock.getDelta(), 0.033);
         if (mixer) {
           mixer.update(delta);
         }

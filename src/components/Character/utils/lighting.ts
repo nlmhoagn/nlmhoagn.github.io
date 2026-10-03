@@ -29,14 +29,22 @@ const setLighting = (scene: THREE.Scene) => {
   pointLight.castShadow = true;
   scene.add(pointLight);
 
-  new RGBELoader()
-    .setPath(`${BASE_URL}models/`)
-    .load("char_enviorment.hdr", function (texture) {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      scene.environment = texture;
-      scene.environmentIntensity = 0;
-      scene.environmentRotation.set(5.76, 85.85, 1);
-    });
+  const envPromise = new Promise<THREE.DataTexture | null>((resolve) => {
+    new RGBELoader()
+      .setPath(`${BASE_URL}models/`)
+      .load(
+        "char_enviorment.hdr",
+        function (texture) {
+          texture.mapping = THREE.EquirectangularReflectionMapping;
+          scene.environment = texture;
+          scene.environmentIntensity = 0;
+          scene.environmentRotation.set(5.76, 85.85, 1);
+          resolve(texture);
+        },
+        undefined,
+        () => resolve(null)
+      );
+  });
 
   function setPointLight(screenLight: THREE.Mesh | THREE.Object3D | null) {
     if (screenLight && (screenLight as THREE.Mesh).material) {
@@ -76,7 +84,7 @@ const setLighting = (scene: THREE.Scene) => {
     });
   }
 
-  return { setPointLight, turnOnLights };
+  return { setPointLight, turnOnLights, envPromise };
 };
 
 export default setLighting;
