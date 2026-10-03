@@ -4,22 +4,23 @@ import * as THREE from "three";
  * Customizes the 3D character to match Hoang Nguyen (Nguyen Le Minh Hoang):
  * - Natural healthy warm radiant Asian skin tone (mặt, cổ, tai, tay)
  * - Matte black crewneck T-shirt (áo thun đen)
- * - Transparent acetate square glasses (kính gọng vuông trong suốt, viền sáng bóng)
- * - Middle-parted curtain bangs hairstyle (tóc hai mái rẽ ngôi tự nhiên)
- * - Golden blonde mullet nape hair (phần gáy tóc dài hơn màu vàng nổi bật, ôm nhẹ hai bên cổ)
- * - Clean natural eyes and eyebrows
+ * - Natural eyes with white sclera (tròng trắng) and deep pupils
+ * - Oversized soft-rounded acetate glasses (kính to hơn, bo cong mềm mại không vuông vức)
+ * - Two-block hairstyle bangs touching eyebrows (tóc mái two-block dài chạm lông mày)
+ * - Golden blonde mullet nape hair (phần gáy tóc dài hơn màu vàng nổi bật)
+ * - Silver hoop earrings (khuyên tai vòng):
+ *   + Tai trái: 1st lobe, 2nd lobe, và conch
+ *   + Tai phải: 1st lobe
  */
 export function customizeCharacter(character: THREE.Object3D) {
   // 1. Color palette tailored to user's photo
-  const skinColor = new THREE.Color("#fae4d7"); // Fair, luminous, healthy Asian skin tone
+  const skinColor = new THREE.Color("#fceee5"); // Fair, luminous, healthy radiant Asian skin tone
   const shirtColor = new THREE.Color("#131315"); // Deep matte black crewneck T-shirt
   const hairColor = new THREE.Color("#161418"); // Natural dark espresso black
   const browColor = new THREE.Color("#18161a"); // Refined dark eyebrows
-  const eyesColor = new THREE.Color("#1a1820"); // Natural deep dark eyes
   const pantsColor = new THREE.Color("#1c1b22"); // Dark denim pants
 
   // 2. Traverse all meshes and assign independent materials
-  // Note: Three.js GLTFLoader sanitizes dots in node names (e.g. Plane.007 -> Plane007, BODY.SHIRT -> BODYSHIRT)
   character.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh;
@@ -35,10 +36,10 @@ export function customizeCharacter(character: THREE.Object3D) {
       ) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: skinColor,
-          roughness: 0.48,
+          roughness: 0.45,
           metalness: 0.0,
-          emissive: new THREE.Color("#221411"),
-          emissiveIntensity: 0.08, // Subtle subsurface glow for lively skin
+          emissive: new THREE.Color("#35201b"),
+          emissiveIntensity: 0.14, // Healthy vibrant glow for youthful skin
         });
       } else if (name.includes("SHIRT") || name.includes("BODY")) {
         mesh.material = new THREE.MeshStandardMaterial({
@@ -59,11 +60,14 @@ export function customizeCharacter(character: THREE.Object3D) {
           metalness: 0.0,
         });
       } else if (name.includes("EYEs") || name.includes("Eyes")) {
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: eyesColor,
-          roughness: 0.15,
-          metalness: 0.1,
-        });
+        // PRESERVE the original eye texture map which contains the white sclera (tròng trắng) and iris!
+        if (mesh.material) {
+          const eyeMat = (mesh.material as THREE.MeshStandardMaterial).clone();
+          eyeMat.color.set(0xffffff); // Pure white tint so sclera renders crisp and clear
+          eyeMat.roughness = 0.06;
+          eyeMat.metalness = 0.02;
+          mesh.material = eyeMat;
+        }
       } else if (name.includes("Pant")) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: pantsColor,
@@ -80,9 +84,17 @@ export function customizeCharacter(character: THREE.Object3D) {
     character.getObjectByName("spine.006") ||
     character;
 
-  // Add stylish transparent square glasses matching user's photo
-  const glasses = createTransparentGlasses();
+  // Add oversized rounded acetate glasses (kính to hơn, bo cong mềm mại)
+  const glasses = createOversizedGlasses();
   headBone.add(glasses);
+
+  // Add two-block bangs touching eyebrows (tóc mái two-block dài chạm lông mày)
+  const bangs = createTwoBlockBangs();
+  headBone.add(bangs);
+
+  // Add silver hoop earrings (khuyên tai vòng: trái 1st, 2nd, conch; phải 1st lobe)
+  const earrings = createEarrings();
+  headBone.add(earrings);
 
   // Add golden blonde mullet nape hair (phần gáy tóc dài hơn màu vàng)
   const blondeNape = createBlondeMulletNape();
@@ -90,167 +102,385 @@ export function customizeCharacter(character: THREE.Object3D) {
 }
 
 /**
- * Creates stylish clear transparent acetate glasses matching user's photo:
- * - Square frame with smooth rounded corners
- * - Luminous translucent clear acetate with glossy reflections
- * - Precise eye center positioning (y = 1.28)
+ * Creates stylish oversized acetate glasses matching user's photo:
+ * - Generous fashionable size (width 0.52, height 0.42)
+ * - Soft rounded lower contour (không vuông vức)
+ * - Clear translucent acetate with bright glossy reflections
+ * - Centered naturally in front of eyes
  * - Silver hinge rivets on outer temples
  */
-function createTransparentGlasses(): THREE.Group {
+function createOversizedGlasses(): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangGlasses";
 
-  // Translucent glossy clear acetate material that stays bright and crystal-clear
   const frameMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.68,
-    roughness: 0.08,
-    metalness: 0.15,
+    opacity: 0.60,
+    roughness: 0.06,
+    metalness: 0.08,
     emissive: 0xffffff,
-    emissiveIntensity: 0.22, // Keeps the clear acetate bright and readable
+    emissiveIntensity: 0.22,
   });
 
   const lensMat = new THREE.MeshStandardMaterial({
-    color: 0xf0f7ff,
+    color: 0xf4f8ff,
     transparent: true,
-    opacity: 0.16,
-    roughness: 0.04,
-    metalness: 0.05,
-    emissive: 0xeef6ff,
-    emissiveIntensity: 0.10,
+    opacity: 0.12,
+    roughness: 0.02,
+    metalness: 0.02,
+    emissive: 0xedf4ff,
+    emissiveIntensity: 0.08,
   });
 
   const silverHingeMat = new THREE.MeshStandardMaterial({
-    color: 0xe0e0e0,
-    metalness: 0.95,
-    roughness: 0.15,
+    color: 0xe5e5e5,
+    metalness: 0.98,
+    roughness: 0.10,
   });
 
-  const rimWidth = 0.38;
-  const rimHeight = 0.30;
-  const rimRadius = 0.06;
-  const rimThick = 0.034;
+  const rimWidth = 0.52; // Oversized width
+  const rimHeight = 0.42; // Oversized height
+  const rimThick = 0.026; // Refined translucent rim thickness
 
-  function makeRimGeometry() {
+  // Soft rounded contour: gentle brow line on top, smooth generous round curve on bottom
+  function makeSoftRoundedRimShape() {
     const shape = new THREE.Shape();
-    const x = -rimWidth / 2;
-    const y = -rimHeight / 2;
-    shape.moveTo(x + rimRadius, y);
-    shape.lineTo(x + rimWidth - rimRadius, y);
-    shape.quadraticCurveTo(x + rimWidth, y, x + rimWidth, y + rimRadius);
-    shape.lineTo(x + rimWidth, y + rimHeight - rimRadius);
-    shape.quadraticCurveTo(x + rimWidth, y + rimHeight, x + rimWidth - rimRadius, y + rimHeight);
-    shape.lineTo(x + rimRadius, y + rimHeight);
-    shape.quadraticCurveTo(x, y + rimHeight, x, y + rimHeight - rimRadius);
-    shape.lineTo(x, y + rimRadius);
-    shape.quadraticCurveTo(x, y, x + rimRadius, y);
+    const halfW = rimWidth / 2;
+    const halfH = rimHeight / 2;
+    const topRadius = 0.10;
+    const botRadius = 0.20; // Deep generous curve gives the soft rounded bottom
 
+    // Outer contour
+    shape.moveTo(-halfW + topRadius, halfH);
+    shape.lineTo(halfW - topRadius, halfH);
+    shape.quadraticCurveTo(halfW, halfH, halfW, halfH - topRadius);
+    shape.lineTo(halfW * 0.92, -halfH + botRadius);
+    shape.quadraticCurveTo(halfW * 0.92, -halfH, halfW * 0.92 - botRadius, -halfH);
+    shape.lineTo(-halfW * 0.92 + botRadius, -halfH);
+    shape.quadraticCurveTo(-halfW * 0.92, -halfH, -halfW * 0.92, -halfH + botRadius);
+    shape.lineTo(-halfW, halfH - topRadius);
+    shape.quadraticCurveTo(-halfW, halfH, -halfW + topRadius, halfH);
+
+    // Inner hole for lens
     const hole = new THREE.Path();
-    const iw = rimWidth - rimThick * 2;
-    const ih = rimHeight - rimThick * 2;
-    const ir = Math.max(0.01, rimRadius - rimThick);
-    const ix = -iw / 2;
-    const iy = -ih / 2;
-    hole.moveTo(ix + ir, iy);
-    hole.lineTo(ix + iw - ir, iy);
-    hole.quadraticCurveTo(ix + iw, iy, ix + iw, iy + ir);
-    hole.lineTo(ix + iw, iy + ih - ir);
-    hole.quadraticCurveTo(ix + iw, iy + ih, ix + iw - ir, iy + ih);
-    hole.lineTo(ix + ir, iy + ih);
-    hole.quadraticCurveTo(ix, iy + ih, ix, iy + ih - ir);
-    hole.lineTo(ix + ir, iy + ir);
-    hole.quadraticCurveTo(ix, iy, ix + ir, iy);
+    const iHalfW = halfW - rimThick;
+    const iHalfH = halfH - rimThick;
+    const iTopR = Math.max(0.02, topRadius - rimThick);
+    const iBotR = Math.max(0.04, botRadius - rimThick);
+
+    hole.moveTo(-iHalfW + iTopR, iHalfH);
+    hole.lineTo(iHalfW - iTopR, iHalfH);
+    hole.quadraticCurveTo(iHalfW, iHalfH, iHalfW, iHalfH - iTopR);
+    hole.lineTo(iHalfW * 0.92, -iHalfH + iBotR);
+    hole.quadraticCurveTo(iHalfW * 0.92, -iHalfH, iHalfW * 0.92 - iBotR, -iHalfH);
+    hole.lineTo(-iHalfW * 0.92 + iBotR, -iHalfH);
+    hole.quadraticCurveTo(-iHalfW * 0.92, -iHalfH, -iHalfW * 0.92, -iHalfH + iBotR);
+    hole.lineTo(-iHalfW, iHalfH - iTopR);
+    hole.quadraticCurveTo(-iHalfW, iHalfH, -iHalfW + iTopR, iHalfH);
 
     shape.holes.push(hole);
 
     return new THREE.ExtrudeGeometry(shape, {
-      depth: 0.035,
+      depth: 0.030,
       bevelEnabled: true,
-      bevelSegments: 2,
+      bevelSegments: 3,
       steps: 1,
-      bevelSize: 0.007,
-      bevelThickness: 0.007,
+      bevelSize: 0.006,
+      bevelThickness: 0.006,
     });
   }
 
-  function makeLensGeometry() {
+  function makeSoftRoundedLensShape() {
     const shape = new THREE.Shape();
-    const x = -rimWidth / 2;
-    const y = -rimHeight / 2;
-    shape.moveTo(x + rimRadius, y);
-    shape.lineTo(x + rimWidth - rimRadius, y);
-    shape.quadraticCurveTo(x + rimWidth, y, x + rimWidth, y + rimRadius);
-    shape.lineTo(x + rimWidth, y + rimHeight - rimRadius);
-    shape.quadraticCurveTo(x + rimWidth, y + rimHeight, x + rimWidth - rimRadius, y + rimHeight);
-    shape.lineTo(x + rimRadius, y + rimHeight);
-    shape.quadraticCurveTo(x, y + rimHeight, x, y + rimHeight - rimRadius);
-    shape.lineTo(x, y + rimRadius);
-    shape.quadraticCurveTo(x, y, x + rimRadius, y);
+    const halfW = rimWidth / 2 - rimThick * 0.5;
+    const halfH = rimHeight / 2 - rimThick * 0.5;
+    const topRadius = 0.09;
+    const botRadius = 0.18;
+
+    shape.moveTo(-halfW + topRadius, halfH);
+    shape.lineTo(halfW - topRadius, halfH);
+    shape.quadraticCurveTo(halfW, halfH, halfW, halfH - topRadius);
+    shape.lineTo(halfW * 0.92, -halfH + botRadius);
+    shape.quadraticCurveTo(halfW * 0.92, -halfH, halfW * 0.92 - botRadius, -halfH);
+    shape.lineTo(-halfW * 0.92 + botRadius, -halfH);
+    shape.quadraticCurveTo(-halfW * 0.92, -halfH, -halfW * 0.92, -halfH + botRadius);
+    shape.lineTo(-halfW, halfH - topRadius);
+    shape.quadraticCurveTo(-halfW, halfH, -halfW + topRadius, halfH);
+
     return new THREE.ShapeGeometry(shape);
   }
 
-  const rimGeo = makeRimGeometry();
-  const lensGeo = makeLensGeometry();
+  const rimGeo = makeSoftRoundedRimShape();
+  const lensGeo = makeSoftRoundedLensShape();
 
-  // Eye centers are at x = ±0.34, y = 1.28, z = 1.08
+  // Eye centers are at x = ±0.36, y = 1.25, z = 1.10
   // Left Eye Rim & Lens
   const leftRim = new THREE.Mesh(rimGeo, frameMat);
-  leftRim.position.set(0.35, 1.28, 1.09);
+  leftRim.position.set(0.36, 1.25, 1.10);
   leftRim.rotation.x = -0.04;
   group.add(leftRim);
 
   const leftLens = new THREE.Mesh(lensGeo, lensMat);
-  leftLens.position.set(0.35, 1.28, 1.105);
+  leftLens.position.set(0.36, 1.25, 1.115);
   leftLens.rotation.x = -0.04;
   group.add(leftLens);
 
   // Right Eye Rim & Lens
   const rightRim = new THREE.Mesh(rimGeo, frameMat);
-  rightRim.position.set(-0.35, 1.28, 1.09);
+  rightRim.position.set(-0.36, 1.25, 1.10);
   rightRim.rotation.x = -0.04;
   group.add(rightRim);
 
   const rightLens = new THREE.Mesh(lensGeo, lensMat);
-  rightLens.position.set(-0.35, 1.28, 1.105);
+  rightLens.position.set(-0.36, 1.25, 1.115);
   rightLens.rotation.x = -0.04;
   group.add(rightLens);
 
-  // Nose Bridge connecting the two rims
-  const bridgeGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.28, 8);
+  // Sleek arched bridge connecting frames over nose
+  const bridgeCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.10, 1.35, 1.11),
+    new THREE.Vector3(0.00, 1.38, 1.12),
+    new THREE.Vector3(0.10, 1.35, 1.11),
+  ]);
+  const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 12, 0.014, 8, false);
   const bridge = new THREE.Mesh(bridgeGeo, frameMat);
-  bridge.rotation.z = Math.PI / 2;
-  bridge.position.set(0, 1.32, 1.10);
   group.add(bridge);
 
-  // Temple Arms going back towards the ears
-  const templeArmGeo = new THREE.BoxGeometry(0.024, 0.032, 1.05);
+  // Temple Arms going back to the ears
+  const templeArmGeo = new THREE.BoxGeometry(0.020, 0.028, 1.05);
 
   const leftArm = new THREE.Mesh(templeArmGeo, frameMat);
-  leftArm.position.set(0.55, 1.30, 0.55);
+  leftArm.position.set(0.61, 1.35, 0.55);
   leftArm.rotation.y = -0.07;
   group.add(leftArm);
 
   const rightArm = new THREE.Mesh(templeArmGeo, frameMat);
-  rightArm.position.set(-0.55, 1.30, 0.55);
+  rightArm.position.set(-0.61, 1.35, 0.55);
   rightArm.rotation.y = 0.07;
   group.add(rightArm);
 
-  // Silver metal hinge rivets on the outer front corners
-  const hingeGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.025, 8);
+  // Silver metal hinge rivets on outer front corners
+  const hingeGeo = new THREE.CylinderGeometry(0.010, 0.010, 0.024, 8);
   const leftHinge = new THREE.Mesh(hingeGeo, silverHingeMat);
   leftHinge.rotation.x = Math.PI / 2;
-  leftHinge.position.set(0.55, 1.32, 1.11);
+  leftHinge.position.set(0.60, 1.37, 1.12);
   group.add(leftHinge);
 
   const rightHinge = new THREE.Mesh(hingeGeo, silverHingeMat);
   rightHinge.rotation.x = Math.PI / 2;
-  rightHinge.position.set(-0.55, 1.32, 1.11);
+  rightHinge.position.set(-0.60, 1.37, 1.12);
   group.add(rightHinge);
 
   return group;
 }
 
+/**
+ * Creates stylish Korean two-block haircut bangs (tóc mái two-block)
+ * falling from the hairline and touching right on the eyebrows.
+ */
+function createTwoBlockBangs(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = "hoangTwoBlockBangs";
+
+  const hairMat = new THREE.MeshStandardMaterial({
+    color: "#161418", // Natural dark espresso black
+    roughness: 0.70,
+    metalness: 0.04,
+  });
+
+  function makeHairStrand(points: THREE.Vector3[], radius: number) {
+    const curve = new THREE.CatmullRomCurve3(points);
+    const geom = new THREE.TubeGeometry(curve, 20, radius, 8, false);
+    return new THREE.Mesh(geom, hairMat);
+  }
+
+  // --- Volumetric Two-Block Fringe (Tóc mái Two-block phủ trán chạm lông mày) ---
+  // Forehead surface is at z ~ 0.98 - 1.04. Hair arches forward to z ~ 1.10 - 1.16,
+  // then drops down to touch the eyebrows at y ~ 1.58 - 1.62.
+
+  // Primary Bottom Layer (Touches Eyebrows!)
+  // Left side:
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.04, 1.88, 0.90),
+    new THREE.Vector3(0.07, 1.76, 1.10),
+    new THREE.Vector3(0.10, 1.66, 1.14),
+    new THREE.Vector3(0.14, 1.58, 1.12),
+  ], 0.056));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.12, 1.88, 0.88),
+    new THREE.Vector3(0.16, 1.76, 1.11),
+    new THREE.Vector3(0.20, 1.66, 1.14),
+    new THREE.Vector3(0.25, 1.58, 1.11),
+  ], 0.058));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.20, 1.86, 0.86),
+    new THREE.Vector3(0.26, 1.74, 1.09),
+    new THREE.Vector3(0.32, 1.65, 1.12),
+    new THREE.Vector3(0.38, 1.58, 1.09),
+  ], 0.056));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.30, 1.84, 0.82),
+    new THREE.Vector3(0.38, 1.72, 1.06),
+    new THREE.Vector3(0.44, 1.63, 1.09),
+    new THREE.Vector3(0.50, 1.56, 1.05),
+  ], 0.052));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.40, 1.80, 0.78),
+    new THREE.Vector3(0.48, 1.68, 1.00),
+    new THREE.Vector3(0.54, 1.59, 1.03),
+    new THREE.Vector3(0.60, 1.50, 0.98),
+  ], 0.048));
+
+  // Right side:
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.04, 1.88, 0.90),
+    new THREE.Vector3(-0.07, 1.76, 1.10),
+    new THREE.Vector3(-0.10, 1.66, 1.14),
+    new THREE.Vector3(-0.14, 1.58, 1.12),
+  ], 0.056));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.12, 1.88, 0.88),
+    new THREE.Vector3(-0.16, 1.76, 1.11),
+    new THREE.Vector3(-0.20, 1.66, 1.14),
+    new THREE.Vector3(-0.25, 1.58, 1.11),
+  ], 0.058));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.20, 1.86, 0.86),
+    new THREE.Vector3(-0.26, 1.74, 1.09),
+    new THREE.Vector3(-0.32, 1.65, 1.12),
+    new THREE.Vector3(-0.38, 1.58, 1.09),
+  ], 0.056));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.30, 1.84, 0.82),
+    new THREE.Vector3(-0.38, 1.72, 1.06),
+    new THREE.Vector3(-0.44, 1.63, 1.09),
+    new THREE.Vector3(-0.50, 1.56, 1.05),
+  ], 0.052));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.40, 1.80, 0.78),
+    new THREE.Vector3(-0.48, 1.68, 1.00),
+    new THREE.Vector3(-0.54, 1.59, 1.03),
+    new THREE.Vector3(-0.60, 1.50, 0.98),
+  ], 0.048));
+
+  // Secondary Upper Layer (Adds stylish texture & natural volume)
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.06, 1.92, 0.82),
+    new THREE.Vector3(0.12, 1.82, 1.02),
+    new THREE.Vector3(0.20, 1.72, 1.12),
+    new THREE.Vector3(0.28, 1.63, 1.10),
+  ], 0.052));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(0.18, 1.90, 0.80),
+    new THREE.Vector3(0.26, 1.80, 1.00),
+    new THREE.Vector3(0.34, 1.70, 1.10),
+    new THREE.Vector3(0.42, 1.62, 1.08),
+  ], 0.050));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.06, 1.92, 0.82),
+    new THREE.Vector3(-0.12, 1.82, 1.02),
+    new THREE.Vector3(-0.20, 1.72, 1.12),
+    new THREE.Vector3(-0.28, 1.63, 1.10),
+  ], 0.052));
+
+  group.add(makeHairStrand([
+    new THREE.Vector3(-0.18, 1.90, 0.80),
+    new THREE.Vector3(-0.26, 1.80, 1.00),
+    new THREE.Vector3(-0.34, 1.70, 1.10),
+    new THREE.Vector3(-0.42, 1.62, 1.08),
+  ], 0.050));
+
+  // Volumetric upper crown base seamlessly bridging top hair to bangs
+  const crownBaseCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.55, 1.80, 0.76),
+    new THREE.Vector3(-0.28, 1.85, 0.90),
+    new THREE.Vector3(0.00, 1.87, 0.94),
+    new THREE.Vector3(0.28, 1.85, 0.90),
+    new THREE.Vector3(0.55, 1.80, 0.76),
+  ]);
+  group.add(new THREE.Mesh(
+    new THREE.TubeGeometry(crownBaseCurve, 24, 0.075, 8, false),
+    hairMat
+  ));
+
+  // Mid-forehead volume filler to eliminate any exposed forehead gap
+  const midBaseCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.52, 1.74, 0.86),
+    new THREE.Vector3(-0.26, 1.78, 1.02),
+    new THREE.Vector3(0.00, 1.80, 1.05),
+    new THREE.Vector3(0.26, 1.78, 1.02),
+    new THREE.Vector3(0.52, 1.74, 0.86),
+  ]);
+  group.add(new THREE.Mesh(
+    new THREE.TubeGeometry(midBaseCurve, 24, 0.065, 8, false),
+    hairMat
+  ));
+
+  return group;
+}
+
+/**
+ * Creates silver hoop earrings (khuyên tai vòng) matching user request:
+ * - Tai trái: 1st lobe, 2nd lobe, và conch
+ * - Tai phải: 1st lobe
+ */
+function createEarrings(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = "hoangEarrings";
+
+  const silverMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff, // Bright polished sterling silver
+    metalness: 0.98,
+    roughness: 0.08,
+    emissive: 0x555555,
+    emissiveIntensity: 0.25, // Brilliant specular shine
+  });
+
+  // Helper to build a hoop ring
+  function makeHoop(radius: number, tube: number) {
+    const geo = new THREE.TorusGeometry(radius, tube, 16, 32);
+    return new THREE.Mesh(geo, silverMat);
+  }
+
+  // --- TAI TRÁI (LEFT EAR, x > 0) ---
+  // 1. Left 1st Lobe (dưới cùng của dái tai trái)
+  const left1stLobe = makeHoop(0.065, 0.010);
+  left1stLobe.position.set(1.12, 0.72, 0.35);
+  left1stLobe.rotation.set(0.15, 1.50, 0);
+  group.add(left1stLobe);
+
+  // 2. Left 2nd Lobe (ngay trên 1st lobe dọc vành dái tai trái)
+  const left2ndLobe = makeHoop(0.054, 0.0085);
+  left2ndLobe.position.set(1.18, 0.80, 0.32);
+  left2ndLobe.rotation.set(0.10, 1.45, 0.15);
+  group.add(left2ndLobe);
+
+  // 3. Left Conch (vòng sụn conch ôm qua vành tai giữa)
+  const leftConch = makeHoop(0.085, 0.011);
+  leftConch.position.set(1.34, 1.02, 0.23);
+  leftConch.rotation.set(-0.25, 1.25, 0.20);
+  group.add(leftConch);
+
+  // --- TAI PHẢI (RIGHT EAR, x < 0) ---
+  // 1. Right 1st Lobe (dưới cùng của dái tai phải)
+  const right1stLobe = makeHoop(0.065, 0.010);
+  right1stLobe.position.set(-1.12, 0.72, 0.35);
+  right1stLobe.rotation.set(0.15, -1.50, 0);
+  group.add(right1stLobe);
+
+  return group;
+}
 
 /**
  * Creates golden blonde mullet/wolf-cut nape hair locks
