@@ -1,67 +1,76 @@
 <svg width="600" height="380" viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#120c1d" />
-      <stop offset="50%" stop-color="#211336" />
-      <stop offset="100%" stop-color="#0c0716" />
+      <stop offset="0%" stop-color="#110d1c" />
+      <stop offset="50%" stop-color="#1b142e" />
+      <stop offset="100%" stop-color="#0a0812" />
     </linearGradient>
   </defs>
 
-  <rect width="600" height="380" rx="16" fill="url(#bgGrad6)" stroke="#3e2363" stroke-width="1.5" />
+  <rect width="600" height="380" rx="16" fill="url(#bgGrad6)" stroke="#392659" stroke-width="1.5" />
 
   <!-- Top Bar -->
-  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(18, 12, 30, 0.9)" stroke="rgba(255,255,255,0.1)" />
+  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(23, 17, 38, 0.9)" stroke="rgba(255,255,255,0.1)" />
   <circle cx="48" cy="45" r="5" fill="#a855f7" />
-  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">Advanced Research Interests</text>
-  <rect x="360" y="32" width="200" height="25" rx="6" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="1" />
-  <text x="374" y="49" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">ON-DEVICE LLM & GRAPHS</text>
+  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">Edge AI &amp; Efficient Computing Research</text>
+  <rect x="385" y="32" width="175" height="25" rx="6" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="1" />
+  <text x="400" y="49" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">ON-DEVICE SLM &amp; KG</text>
 
-  <!-- Left: Quantized Neural Weights -->
-  <g transform="translate(45, 95)">
-    <rect width="210" height="170" rx="10" fill="#181026" stroke="#a855f7" stroke-width="1" />
-    <text x="18" y="28" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">QUANTIZED SLM (INT4)</text>
+  <!-- Flowchart Architecture -->
+  <g transform="translate(30, 95)">
+    <!-- Stage 1: Base SLM Model -->
+    <rect x="0" y="20" width="115" height="110" rx="8" fill="#1b152d" stroke="rgba(255,255,255,0.1)" />
+    <text x="14" y="45" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">Step 1</text>
+    <text x="14" y="68" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Small LM</text>
+    <text x="14" y="85" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Transformer</text>
+    <text x="14" y="112" fill="#94a3b8" font-size="9" font-family="monospace">1B - 3B Params</text>
 
-    <!-- Matrix Blocks -->
-    <g transform="translate(18, 45)">
-      <rect x="0" y="0" width="36" height="36" rx="4" fill="#6b21a8" />
-      <rect x="44" y="0" width="36" height="36" rx="4" fill="#a855f7" />
-      <rect x="88" y="0" width="36" height="36" rx="4" fill="#c084fc" />
-      <rect x="132" y="0" width="36" height="36" rx="4" fill="#4c1d95" />
+    <!-- Arrow 1 -->
+    <path d="M 120 75 L 140 75" stroke="#a855f7" stroke-width="2" />
 
-      <rect x="0" y="44" width="36" height="36" rx="4" fill="#a855f7" />
-      <rect x="44" y="44" width="36" height="36" rx="4" fill="#6b21a8" />
-      <rect x="88" y="44" width="36" height="36" rx="4" fill="#4c1d95" />
-      <rect x="132" y="44" width="36" height="36" rx="4" fill="#c084fc" />
+    <!-- Stage 2: Dual Compression & Knowledge Augmentation -->
+    <g transform="translate(145, 0)">
+      <!-- AWQ INT4 Branch -->
+      <rect x="0" y="0" width="125" height="65" rx="8" fill="#241b14" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="25" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">AWQ / INT4</text>
+      <text x="12" y="48" fill="#cbd5e1" font-size="10" font-family="sans-serif">Weight Quantization</text>
+
+      <!-- Knowledge Graph Branch -->
+      <rect x="0" y="80" width="125" height="65" rx="8" fill="#16253b" stroke="#38bdf8" stroke-width="1" />
+      <text x="12" y="105" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">Knowledge Graph</text>
+      <text x="12" y="128" fill="#cbd5e1" font-size="10" font-family="sans-serif">Symbolic Reasoning</text>
     </g>
 
-    <text x="18" y="148" fill="#e9d5ff" font-size="10" font-family="monospace">On-Device Edge Inference</text>
+    <!-- Arrow 2 Merge -->
+    <path d="M 275 32 L 305 75" stroke="#fbbf24" stroke-width="1.5" />
+    <path d="M 275 112 L 305 75" stroke="#38bdf8" stroke-width="1.5" />
+
+    <!-- Stage 3: On-Device NPU Engine -->
+    <g transform="translate(315, 20)">
+      <rect x="0" y="0" width="115" height="110" rx="8" fill="#1f1838" stroke="#a855f7" stroke-width="1.5" />
+      <text x="14" y="30" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">Step 3</text>
+      <text x="14" y="55" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">NPU Engine</text>
+      <text x="14" y="72" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Runtime</text>
+      <text x="14" y="98" fill="#e879f9" font-size="10" font-family="monospace">Low-Latency</text>
+    </g>
+
+    <!-- Arrow 3 -->
+    <path d="M 435 75 L 455 75" stroke="#a855f7" stroke-width="2" />
+
+    <!-- Final Output -->
+    <g transform="translate(460, 20)">
+      <rect x="0" y="0" width="80" height="110" rx="8" fill="#132320" stroke="#10b981" stroke-width="1.5" />
+      <text x="12" y="35" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">OUTPUT</text>
+      <text x="12" y="60" fill="#fff" font-family="'Inter', sans-serif" font-size="11" font-weight="600">Private</text>
+      <text x="12" y="78" fill="#fff" font-family="'Inter', sans-serif" font-size="11" font-weight="600">Local AI</text>
+      <circle cx="40" cy="95" r="4" fill="#10b981" />
+    </g>
   </g>
 
-  <!-- Right: Knowledge Graph Reasoning -->
-  <g transform="translate(285, 95)">
-    <rect width="270" height="170" rx="10" fill="#181026" stroke="#00f5ff" stroke-width="1" />
-    <text x="18" y="28" fill="#00f5ff" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">GRAPH REASONING</text>
-
-    <!-- Graph Nodes -->
-    <circle cx="60" cy="80" r="18" fill="#00f5ff" opacity="0.2" stroke="#00f5ff" stroke-width="1.5" />
-    <text x="48" y="84" fill="#ffffff" font-size="10" font-family="sans-serif">Node A</text>
-
-    <circle cx="210" cy="70" r="18" fill="#a855f7" opacity="0.2" stroke="#a855f7" stroke-width="1.5" />
-    <text x="198" y="74" fill="#ffffff" font-size="10" font-family="sans-serif">Node B</text>
-
-    <circle cx="135" cy="135" r="18" fill="#22c55e" opacity="0.2" stroke="#22c55e" stroke-width="1.5" />
-    <text x="123" y="139" fill="#ffffff" font-size="10" font-family="sans-serif">Node C</text>
-
-    <!-- Edge Lines -->
-    <line x1="78" y1="80" x2="192" y2="72" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
-    <line x1="60" y1="98" x2="120" y2="125" stroke="#00f5ff" stroke-width="1.5" opacity="0.6" />
-    <line x1="200" y1="85" x2="150" y2="125" stroke="#a855f7" stroke-width="1.5" opacity="0.6" />
-  </g>
-
-  <!-- Bottom Badges -->
-  <g transform="translate(30, 290)">
-    <rect width="540" height="52" rx="8" fill="rgba(25, 15, 40, 0.85)" stroke="rgba(255,255,255,0.06)" />
-    <text x="25" y="22" fill="#a88ec8" font-size="10">FOCUS TECH</text>
-    <text x="25" y="39" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">TinyML • Edge Quantization • Knowledge Graph Embeddings</text>
+  <!-- Metrics Bar Bottom -->
+  <g transform="translate(30, 295)">
+    <rect width="540" height="50" rx="8" fill="rgba(23, 17, 38, 0.85)" stroke="rgba(255,255,255,0.06)" />
+    <text x="25" y="30" fill="#94a3b8" font-size="11">Hardware: <tspan fill="#38bdf8" font-weight="bold">Edge NPUs &amp; Mobile Silicon</tspan></text>
+    <text x="310" y="30" fill="#94a3b8" font-size="11">Paradigm: <tspan fill="#c084fc" font-weight="bold">Neuro-Symbolic Local Inference</tspan></text>
   </g>
 </svg>
