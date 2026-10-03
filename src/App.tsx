@@ -9,9 +9,18 @@ const App = () => {
   return (
     <>
       <LoadingProvider>
-        <Suspense>
+        <Suspense
+          fallback={
+            <div
+              style={{
+                minHeight: "100vh",
+                backgroundColor: "#0b080c",
+              }}
+            />
+          }
+        >
           <MainContainer>
-            <Suspense>
+            <Suspense fallback={null}>
               <CharacterModel />
             </Suspense>
           </MainContainer>

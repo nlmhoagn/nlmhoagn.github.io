@@ -10,14 +10,27 @@ const Loading = ({ percent }: { percent: number }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [clicked, setClicked] = useState(false);
 
-  if (percent >= 100) {
-    setTimeout(() => {
+  useEffect(() => {
+    if (percent >= 100) {
+      const t1 = setTimeout(() => {
+        setLoaded(true);
+        const t2 = setTimeout(() => {
+          setIsLoaded(true);
+        }, 1000);
+        return () => clearTimeout(t2);
+      }, 600);
+      return () => clearTimeout(t1);
+    }
+  }, [percent]);
+
+  // Safety fallback: auto-complete loading after 5 seconds if still loading
+  useEffect(() => {
+    const safetyTimer = setTimeout(() => {
       setLoaded(true);
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 1000);
-    }, 600);
-  }
+      setIsLoaded(true);
+    }, 5000);
+    return () => clearTimeout(safetyTimer);
+  }, []);
 
   useEffect(() => {
     import("./utils/initialFX").then((module) => {

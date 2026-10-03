@@ -14,7 +14,11 @@ const setCharacter = (
 ) => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath(`${BASE_URL}draco/`);
+  const dracoPath =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${BASE_URL}draco/`
+      : `${BASE_URL}draco/`;
+  dracoLoader.setDecoderPath(dracoPath);
   loader.setDRACOLoader(dracoLoader);
 
   const loadCharacter = async (): Promise<GLTF | null> => {
@@ -25,7 +29,7 @@ const setCharacter = (
       );
       const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
 
-      return new Promise<GLTF | null>((resolve, reject) => {
+      return new Promise<GLTF | null>((resolve) => {
         loader.load(
           blobUrl,
           async (gltf) => {
@@ -51,7 +55,7 @@ const setCharacter = (
           undefined,
           (error) => {
             console.error("Error loading GLTF model:", error);
-            reject(error);
+            resolve(null);
           }
         );
       });

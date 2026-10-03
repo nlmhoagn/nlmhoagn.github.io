@@ -1,14 +1,134 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollSmoother } from "gsap-trial/ScrollSmoother";
-import { SplitText } from "gsap-trial/SplitText";
+
+export interface SplitTextOptions {
+  type?: string;
+  linesClass?: string;
+  wordsClass?: string;
+  charsClass?: string;
+}
+
+export class SplitText {
+  chars: HTMLElement[] = [];
+  words: HTMLElement[] = [];
+  lines: HTMLElement[] = [];
+  elements: HTMLElement[] = [];
+  private originalContent: Map<HTMLElement, string> = new Map();
+
+  constructor(
+    target: string | string[] | HTMLElement | HTMLElement[] | NodeListOf<HTMLElement>,
+    options?: SplitTextOptions
+  ) {
+    const rawElements: HTMLElement[] = [];
+
+    if (typeof target === "string") {
+      document.querySelectorAll(target).forEach((el) => {
+        if (el instanceof HTMLElement) rawElements.push(el);
+      });
+    } else if (Array.isArray(target)) {
+      target.forEach((item) => {
+        if (typeof item === "string") {
+          document.querySelectorAll(item).forEach((el) => {
+            if (el instanceof HTMLElement) rawElements.push(el);
+          });
+        } else if (item instanceof HTMLElement) {
+          rawElements.push(item);
+        }
+      });
+    } else if (target instanceof HTMLElement) {
+      rawElements.push(target);
+    } else if (target && "forEach" in target) {
+      (target as NodeListOf<HTMLElement>).forEach((el) => {
+        if (el instanceof HTMLElement) rawElements.push(el);
+      });
+    }
+
+    this.elements = rawElements;
+    const type = options?.type || "chars";
+    const linesClass = options?.linesClass;
+    const wordsClass = options?.wordsClass;
+    const charsClass = options?.charsClass;
+
+    rawElements.forEach((el) => {
+      this.originalContent.set(el, el.innerHTML);
+      const text = el.textContent || "";
+      el.innerHTML = "";
+
+      if (linesClass) {
+        linesClass.split(" ").filter(Boolean).forEach((cls) => el.classList.add(cls));
+      }
+
+      this.lines.push(el);
+
+      if (type.includes("words") && !type.includes("chars")) {
+        // Words only
+        const words = text.trim().split(/\s+/);
+        words.forEach((w, i) => {
+          const wordSpan = document.createElement("span");
+          wordSpan.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
+          wordSpan.style.display = "inline-block";
+          wordSpan.textContent = w;
+          el.appendChild(wordSpan);
+          this.words.push(wordSpan);
+
+          if (i < words.length - 1) {
+            el.appendChild(document.createTextNode(" "));
+          }
+        });
+      } else {
+        // Chars & words
+        const words = text.split(" ");
+        words.forEach((word, wIdx) => {
+          if (word.length === 0 && wIdx < words.length - 1) {
+            el.appendChild(document.createTextNode(" "));
+            return;
+          }
+
+          const wordWrap = document.createElement("span");
+          wordWrap.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
+          wordWrap.style.display = "inline-block";
+          wordWrap.style.whiteSpace = "nowrap";
+
+          for (let c = 0; c < word.length; c++) {
+            const charSpan = document.createElement("span");
+            charSpan.className = charsClass ? `split-char ${charsClass}` : "split-char";
+            charSpan.style.display = "inline-block";
+            charSpan.textContent = word[c];
+            wordWrap.appendChild(charSpan);
+            this.chars.push(charSpan);
+          }
+
+          el.appendChild(wordWrap);
+          this.words.push(wordWrap);
+
+          if (wIdx < words.length - 1) {
+            const spaceSpan = document.createElement("span");
+            spaceSpan.className = "split-space";
+            spaceSpan.style.display = "inline-block";
+            spaceSpan.innerHTML = "&nbsp;";
+            el.appendChild(spaceSpan);
+          }
+        });
+      }
+    });
+  }
+
+  revert() {
+    this.originalContent.forEach((html, el) => {
+      el.innerHTML = html;
+    });
+    this.chars = [];
+    this.words = [];
+    this.lines = [];
+  }
+}
 
 interface ParaElement extends HTMLElement {
   anim?: gsap.core.Animation;
   split?: SplitText;
 }
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export default function setSplitText() {
   ScrollTrigger.config({ ignoreMobileResize: true });
