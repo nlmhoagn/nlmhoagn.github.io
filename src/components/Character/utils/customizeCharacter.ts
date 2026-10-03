@@ -5,9 +5,9 @@ import * as THREE from "three";
  * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
  * 2. Authentic Boston Red Sox Streetwear Outfit:
  *    - Classic MLB Boston Navy Blue oversized T-shirt (#1a2540)
- *    - Iconic ARCHED crimson "RED SOX" collegiate graphic with white outline on chest
- *    - Loose elbow-length drop-shoulder sleeves (ao tay lung rong rai)
- *    - Sterling silver chain necklace looping fully around the neck and over collar
+ *    - BOLD, PROMINENT ARCHED crimson "RED SOX" collegiate graphic with white outline across the chest
+ *    - True "Tay lửng" (elbow-length sleeves): bare skin forearms with flared oversized boxy sleeves at elbow
+ *    - Sterling silver chain necklace looping fully around the neck skin and over the collar
  *    - Earthy olive cargo khaki pants (#5a5547)
  *    - Chunky off-white cream sneakers (#dedbd4)
  * 3. Clean natural original haircut (bo luon mai di)
@@ -60,11 +60,52 @@ export function customizeCharacter(character: THREE.Object3D) {
         // Completely hide the cartoon dumbo ears!
         mesh.visible = false;
       } else if (name.includes("SHIRT") || name.includes("BODY")) {
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: shirtColor,
-          roughness: 0.90,
-          metalness: 0.02,
-        });
+        // TAY LỬNG: Transform forearms into bare skin while torso & upper arms remain navy shirt!
+        const geom = mesh.geometry;
+        const skinIndex = geom.attributes.skinIndex;
+        const skinWeight = geom.attributes.skinWeight;
+
+        if (skinIndex && skinWeight) {
+          const count = geom.attributes.position.count;
+          const colors = new Float32Array(count * 3);
+
+          for (let i = 0; i < count; i++) {
+            let forearmWeight = 0;
+            const x = skinIndex.getX(i), y = skinIndex.getY(i), z = skinIndex.getZ(i), w = skinIndex.getW(i);
+            const wx = skinWeight.getX(i), wy = skinWeight.getY(i), wz = skinWeight.getZ(i), ww = skinWeight.getW(i);
+
+            // Joint 10 is forearm.L, Joint 33 is forearm.R in character skeleton
+            if (x === 10 || x === 33) forearmWeight += wx;
+            if (y === 10 || y === 33) forearmWeight += wy;
+            if (z === 10 || z === 33) forearmWeight += wz;
+            if (w === 10 || w === 33) forearmWeight += ww;
+
+            if (forearmWeight > 0.40) {
+              // Forearms are BARE SKIN (tay lửng để lộ cẳng tay da thật)!
+              colors[i * 3] = skinColor.r;
+              colors[i * 3 + 1] = skinColor.g;
+              colors[i * 3 + 2] = skinColor.b;
+            } else {
+              // Torso and upper sleeves are Navy T-Shirt!
+              colors[i * 3] = shirtColor.r;
+              colors[i * 3 + 1] = shirtColor.g;
+              colors[i * 3 + 2] = shirtColor.b;
+            }
+          }
+
+          geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          mesh.material = new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.88,
+            metalness: 0.02,
+          });
+        } else {
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: shirtColor,
+            roughness: 0.90,
+            metalness: 0.02,
+          });
+        }
       } else if (name.includes("hair") || name.includes("Hair")) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: hairColor,
@@ -110,7 +151,7 @@ export function customizeCharacter(character: THREE.Object3D) {
   headBone.add(createEarrings());
   headBone.add(createBlondeMulletNape());
 
-  // 5. Chest Bone (spine.003): Arched Red Sox Graphic & Neck-Connected Chain Necklace
+  // 5. Chest Bone (spine.003): Big Bold Arched Red Sox Graphic & Neck-Connected Silver Chain
   const chestBone =
     character.getObjectByName("spine003") ||
     character.getObjectByName("spine.003");
@@ -118,7 +159,7 @@ export function customizeCharacter(character: THREE.Object3D) {
     chestBone.add(createChestGraphic());
   }
 
-  // 6. Arm Bones: Oversized Loose Elbow-Length Sleeves (Tay lửng)
+  // 6. Arm Bones: Flared Drop-Shoulder Elbow-Length Sleeve Cuffs (Tay lửng)
   const armL = character.getObjectByName("upper_arm.L") || character.getObjectByName("upper_armL");
   if (armL) {
     armL.add(createLooseSleeve(true, shirtColor));
@@ -144,34 +185,34 @@ function createLooseSleeve(isLeft: boolean, shirtColor: THREE.Color): THREE.Grou
     side: THREE.DoubleSide,
   });
 
-  // Flared, loose cylinder extending along Y from y = 1.05 to 1.85 (over the elbow)
-  const sleeveGeo = new THREE.CylinderGeometry(0.50, 0.58, 0.80, 16, 1, true);
+  // Flared, loose cylinder extending along Y from y = 0.95 to 1.75 (over the elbow)
+  const sleeveGeo = new THREE.CylinderGeometry(0.55, 0.66, 0.80, 16, 1, true);
   const sleeveMesh = new THREE.Mesh(sleeveGeo, sleeveMat);
-  sleeveMesh.position.set(0, 1.45, 0);
+  sleeveMesh.position.set(0, 1.40, 0);
   group.add(sleeveMesh);
 
-  // Outer hem cuff rim
-  const cuffGeo = new THREE.TorusGeometry(0.58, 0.022, 8, 24);
+  // Outer hem cuff rim giving weight to the oversized tee
+  const cuffGeo = new THREE.TorusGeometry(0.66, 0.026, 8, 24);
   const cuffMesh = new THREE.Mesh(cuffGeo, sleeveMat);
   cuffMesh.rotation.x = Math.PI / 2;
-  cuffMesh.position.set(0, 1.05, 0);
+  cuffMesh.position.set(0, 1.00, 0);
   group.add(cuffMesh);
 
   return group;
 }
 
 /**
- * Creates the authentic ARCHED "RED SOX" athletic chest graphic
- * and a realistic silver chain necklace that loops completely around the neck.
+ * Creates the authentic, large, bold ARCHED "RED SOX" athletic chest graphic
+ * and a realistic silver chain necklace that loops 100% around the neck.
  */
 function createChestGraphic(): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangChestOutfit";
 
-  // Create high-res canvas texture for authentic ARCHED "RED SOX" lettering
+  // Create ultra-high-res 2048x1024 canvas texture for prominent ARCHED "RED SOX" lettering
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 512;
+  canvas.width = 2048;
+  canvas.height = 1024;
   const ctx = canvas.getContext("2d");
   if (ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -179,20 +220,19 @@ function createChestGraphic(): THREE.Group {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Draw Boston Red Sox authentic arched radial typography
-    const centerX = 512;
-    const centerY = 400; // Center of curvature
-    const arcRadius = 260; // Radius of arch
+    // Draw authentic Boston Red Sox arched radial typography spanning across the canvas
+    const centerX = 1024;
+    const centerY = 820; // Center of curvature
+    const arcRadius = 560; // Wide arc radius for prominent chest sweep
 
-    // Letters with precise angular placement creating the signature upward arch
     const letters = [
-      { char: "R", angle: -0.36 },
-      { char: "E", angle: -0.23 },
+      { char: "R", angle: -0.38 },
+      { char: "E", angle: -0.24 },
       { char: "D", angle: -0.11 },
       // gap
       { char: "S", angle: 0.11 },
-      { char: "O", angle: 0.23 },
-      { char: "X", angle: 0.36 },
+      { char: "O", angle: 0.24 },
+      { char: "X", angle: 0.38 },
     ];
 
     letters.forEach(({ char, angle }) => {
@@ -203,9 +243,9 @@ function createChestGraphic(): THREE.Group {
       ctx.translate(x, y);
       ctx.rotate(angle);
 
-      // Outer crisp white athletic border
-      ctx.font = "900 115px 'Arial Black', Impact, sans-serif";
-      ctx.lineWidth = 16;
+      // Outer crisp white athletic border (extra thick and sharp)
+      ctx.font = "900 240px 'Arial Black', Impact, sans-serif";
+      ctx.lineWidth = 32;
       ctx.strokeStyle = "#ffffff";
       ctx.lineJoin = "round";
       ctx.strokeText(char, 0, 0);
@@ -214,9 +254,9 @@ function createChestGraphic(): THREE.Group {
       ctx.fillStyle = "#bd1238";
       ctx.fillText(char, 0, 0);
 
-      // Inner bright crimson core
-      ctx.font = "900 110px 'Arial Black', Impact, sans-serif";
-      ctx.fillStyle = "#df1643";
+      // Inner bright crimson core for brilliant visibility
+      ctx.font = "900 230px 'Arial Black', Impact, sans-serif";
+      ctx.fillStyle = "#e51846";
       ctx.fillText(char, 0, 0);
 
       ctx.restore();
@@ -224,8 +264,8 @@ function createChestGraphic(): THREE.Group {
 
     // Small MLB logo detail below the right side of SOX
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 18px sans-serif";
-    ctx.fillText("MLB", 640, 210);
+    ctx.font = "bold 32px sans-serif";
+    ctx.fillText("MLB", 1360, 480);
   }
 
   const redSoxTexture = new THREE.CanvasTexture(canvas);
@@ -241,26 +281,26 @@ function createChestGraphic(): THREE.Group {
     side: THREE.DoubleSide,
   });
 
-  // Curved cylindrical surface hugging the chest contour
-  const uSegments = 16;
-  const vSegments = 8;
+  // Large curved cylindrical surface spanning across the full chest (Width: 2.20, Height: 0.70)
+  const uSegments = 24;
+  const vSegments = 10;
   const geom = new THREE.BufferGeometry();
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
 
-  const w = 1.05;
-  const h = 0.44;
+  const w = 2.20;
+  const h = 0.70;
 
   for (let iv = 0; iv <= vSegments; iv++) {
     const v = iv / vSegments;
-    const y = 0.30 - v * h; // y ranges from 0.30 down to -0.14 in spine.003 local space
+    const y = 0.52 - v * h; // Placed high on chest right below collar (0.52 down to -0.18)
 
     for (let iu = 0; iu <= uSegments; iu++) {
       const u = iu / uSegments;
       const x = (u - 0.5) * w;
       // Hugs chest curve tightly with slight clearance over t-shirt mesh
-      const z = 1.062 - Math.pow(x, 2) * 0.10 - (v * 0.025);
+      const z = 1.065 - Math.pow(x, 2) * 0.08 - (v * 0.02);
 
       positions.push(x, y, z);
       uvs.push(u, 1 - v);
@@ -288,31 +328,31 @@ function createChestGraphic(): THREE.Group {
   const textMesh = new THREE.Mesh(geom, decalMat);
   group.add(textMesh);
 
-  // REAL SILVER CHAIN NECKLACE: Loops 100% around the neck and drapes over collar & chest
+  // REAL SILVER CHAIN NECKLACE: Loops 100% around the neck and rests against collar
   const silverChainMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     metalness: 0.98,
     roughness: 0.04,
-    emissive: 0x666666,
-    emissiveIntensity: 0.40,
+    emissive: 0x777777,
+    emissiveIntensity: 0.45,
   });
 
   const necklaceCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.00, 1.04, -0.38), // Back of neck
-    new THREE.Vector3(0.22, 0.98, -0.28), // Right back neck
-    new THREE.Vector3(0.33, 0.86, 0.14), // Right side neck
-    new THREE.Vector3(0.28, 0.70, 0.52), // Right collar bone / rib
-    new THREE.Vector3(0.20, 0.52, 0.82), // Right upper chest
-    new THREE.Vector3(0.11, 0.38, 1.02), // Right mid chest
-    new THREE.Vector3(0.00, 0.31, 1.06), // Lowest pendant/chain sag point on chest
-    new THREE.Vector3(-0.11, 0.38, 1.02), // Left mid chest
-    new THREE.Vector3(-0.20, 0.52, 0.82), // Left upper chest
-    new THREE.Vector3(-0.28, 0.70, 0.52), // Left collar bone / rib
-    new THREE.Vector3(-0.33, 0.86, 0.14), // Left side neck
-    new THREE.Vector3(-0.22, 0.98, -0.28), // Left back neck
+    new THREE.Vector3(0.00, 1.24, -0.45), // Back of neck skin
+    new THREE.Vector3(0.30, 1.16, -0.25), // Right back neck
+    new THREE.Vector3(0.42, 1.00, 0.12),  // Right side neck (resting on skin)
+    new THREE.Vector3(0.36, 0.82, 0.55),  // Crossing right collar rib
+    new THREE.Vector3(0.22, 0.68, 0.86),  // Upper chest right
+    new THREE.Vector3(0.10, 0.58, 1.01),  // Mid chest right
+    new THREE.Vector3(0.00, 0.54, 1.04),  // Lowest pendant/chain drop (hanging naturally over chest)
+    new THREE.Vector3(-0.10, 0.58, 1.01), // Mid chest left
+    new THREE.Vector3(-0.22, 0.68, 0.86), // Upper chest left
+    new THREE.Vector3(-0.36, 0.82, 0.55), // Crossing left collar rib
+    new THREE.Vector3(-0.42, 1.00, 0.12), // Left side neck
+    new THREE.Vector3(-0.30, 1.16, -0.25), // Left back neck
   ], true); // Closed loop connecting completely around the neck!
 
-  const necklaceGeo = new THREE.TubeGeometry(necklaceCurve, 32, 0.010, 8, true);
+  const necklaceGeo = new THREE.TubeGeometry(necklaceCurve, 32, 0.012, 8, true);
   group.add(new THREE.Mesh(necklaceGeo, silverChainMat));
 
   return group;
