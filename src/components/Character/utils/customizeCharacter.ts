@@ -108,7 +108,10 @@ export function customizeCharacter(character: THREE.Object3D) {
 }
 
 /**
- * Creates realistic human-proportioned ears positioned naturally on the sides of the head.
+ * Creates realistic human-proportioned ears positioned naturally and gaplessly on the sides of the head:
+ * - Anchored deep into the temporal bone (zero gap / không hở)
+ * - Volumetric anatomical 3D ear with helix, concha cavity, tragus, and ear backing
+ * - 100% mathematical symmetry via sagittal mirror (scale.x = -1) (không lệch)
  */
 function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color): THREE.Group {
   const group = new THREE.Group();
@@ -123,42 +126,99 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
     side: THREE.DoubleSide,
   });
 
-  function makeEar(isLeft: boolean) {
-    const earGroup = new THREE.Group();
-    const s = isLeft ? 1 : -1;
+  const innerEarMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(skinColor).lerp(new THREE.Color("#e8b4a0"), 0.30),
+    roughness: 0.50,
+    metalness: 0.0,
+    emissive: skinEmissive,
+    emissiveIntensity: 0.15,
+    side: THREE.DoubleSide,
+  });
 
-    // Smooth C-curve for outer helix and earlobe:
+  function makeSingleEar(): THREE.Group {
+    const ear = new THREE.Group();
+
+    // 1. ANATOMICAL OUTER HELIX & LOBE
+    // Points start deep inside the skull (x = 0.84),
+    // loop out to form the helix and lobe, and anchor back inside the jawline (x = 0.85).
     const helixCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(s * 0.99, 1.25, 0.32), // Top attachment to temple
-      new THREE.Vector3(s * 1.08, 1.28, 0.26), // Superior crest
-      new THREE.Vector3(s * 1.16, 1.18, 0.22), // Outer helix
-      new THREE.Vector3(s * 1.15, 1.00, 0.23), // Mid ear margin
-      new THREE.Vector3(s * 1.08, 0.86, 0.26), // Lobe curve
-      new THREE.Vector3(s * 1.02, 0.80, 0.28), // 1st Lobe bottom tip
-      new THREE.Vector3(s * 0.99, 0.86, 0.30), // Lobe junction with jaw
+      new THREE.Vector3(0.85, 1.16, 0.24), // Crus helicis root inside skull
+      new THREE.Vector3(0.92, 1.24, 0.21), // Ascending helix
+      new THREE.Vector3(1.02, 1.25, 0.15), // Superior crest
+      new THREE.Vector3(1.07, 1.18, 0.09), // Helix apex
+      new THREE.Vector3(1.08, 1.05, 0.05), // Posterior margin
+      new THREE.Vector3(1.05, 0.93, 0.08), // Lower margin / antihelix transition
+      new THREE.Vector3(1.00, 0.82, 0.14), // Lobe apex (1st lobe)
+      new THREE.Vector3(0.93, 0.81, 0.18), // Lobe bottom curve
+      new THREE.Vector3(0.86, 0.86, 0.22), // Lobule junction anchoring deep into jaw
     ]);
-    const helixGeo = new THREE.TubeGeometry(helixCurve, 24, 0.038, 8, false);
-    earGroup.add(new THREE.Mesh(helixGeo, earMat));
+    const helixGeo = new THREE.TubeGeometry(helixCurve, 32, 0.038, 12, false);
+    ear.add(new THREE.Mesh(helixGeo, earMat));
 
-    // Inner concha / ear backing filling
+    // 2. RETROAURICULAR WEDGE (Ear backing connecting seamlessly into head & hair)
+    // Completely fills the space between the back of the ear and the skull.
+    const backCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.84, 1.22, 0.18),
+      new THREE.Vector3(0.98, 1.21, 0.12),
+      new THREE.Vector3(1.02, 1.08, 0.04),
+      new THREE.Vector3(0.98, 0.95, 0.06),
+      new THREE.Vector3(0.86, 0.88, 0.16),
+    ]);
+    const backGeo = new THREE.TubeGeometry(backCurve, 24, 0.035, 10, false);
+    ear.add(new THREE.Mesh(backGeo, earMat));
+
+    // 3. SOLID 3D EAR BASE (Penetrating deep into the head from x = 0.78 to 1.00)
+    // Eliminates any open seams or holes between the ear and skull
+    const earBaseGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.32, 16);
+    const earBase = new THREE.Mesh(earBaseGeo, earMat);
+    earBase.rotation.z = Math.PI / 2; // Extends along X axis
+    earBase.rotation.y = 0.18;
+    earBase.position.set(0.88, 1.04, 0.14);
+    earBase.scale.set(0.65, 0.50, 0.85);
+    ear.add(earBase);
+
+    // 4. INNER CONCHA & ANTIHELIX DISK (Inner ear bowl with realistic depth)
     const conchaShape = new THREE.Shape();
-    conchaShape.moveTo(0, 0.18);
-    conchaShape.quadraticCurveTo(0.12, 0.18, 0.15, 0.06);
-    conchaShape.quadraticCurveTo(0.16, -0.06, 0.09, -0.16);
-    conchaShape.quadraticCurveTo(0.00, -0.22, -0.04, -0.10);
-    conchaShape.lineTo(-0.04, 0.08);
+    conchaShape.moveTo(-0.06, 0.14);
+    conchaShape.quadraticCurveTo(0.08, 0.15, 0.10, 0.04);
+    conchaShape.quadraticCurveTo(0.11, -0.06, 0.05, -0.15);
+    conchaShape.quadraticCurveTo(-0.02, -0.20, -0.07, -0.10);
+    conchaShape.quadraticCurveTo(-0.08, 0.02, -0.06, 0.14);
 
-    const conchaGeo = new THREE.ShapeGeometry(conchaShape);
-    const conchaMesh = new THREE.Mesh(conchaGeo, earMat);
-    conchaMesh.position.set(s * 1.04, 1.04, 0.26);
-    conchaMesh.rotation.y = s * 0.26;
-    earGroup.add(conchaMesh);
+    const conchaGeo = new THREE.ExtrudeGeometry(conchaShape, {
+      depth: 0.025,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      steps: 1,
+      bevelSize: 0.012,
+      bevelThickness: 0.012,
+    });
+    const conchaMesh = new THREE.Mesh(conchaGeo, innerEarMat);
+    conchaMesh.position.set(0.97, 1.05, 0.14);
+    conchaMesh.rotation.y = Math.PI / 2 + 0.15;
+    conchaMesh.rotation.x = -0.05;
+    ear.add(conchaMesh);
 
-    return earGroup;
+    // 5. TRAGUS (Cartilage nodule guarding the ear canal)
+    const tragusGeo = new THREE.SphereGeometry(0.034, 12, 12);
+    const tragusMesh = new THREE.Mesh(tragusGeo, earMat);
+    tragusMesh.position.set(0.95, 1.04, 0.22);
+    tragusMesh.scale.set(0.8, 1.4, 1.0);
+    ear.add(tragusMesh);
+
+    return ear;
   }
 
-  group.add(makeEar(true));
-  group.add(makeEar(false));
+  // Left ear (canonical)
+  const leftEar = makeSingleEar();
+  leftEar.name = "leftEar";
+  group.add(leftEar);
+
+  // Right ear (perfect mirror across sagittal plane)
+  const rightEar = makeSingleEar();
+  rightEar.name = "rightEar";
+  rightEar.scale.set(-1, 1, 1);
+  group.add(rightEar);
 
   return group;
 }
@@ -168,6 +228,7 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
  * - Generous proportions: width 0.58, height 0.46
  * - Distinctive soft rounded pantos bottom (eliminating boxiness/squareness)
  * - Translucent crystal clear acetate frame with glossy reflections and silver rivets
+ * - Front frame only (temple arms removed as requested to avoid poking into the eyes)
  * - Centered right over eye pupils
  */
 function createOversizedGlasses(): THREE.Group {
@@ -300,18 +361,7 @@ function createOversizedGlasses(): THREE.Group {
   const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 14, 0.018, 8, false);
   group.add(new THREE.Mesh(bridgeGeo, frameMat));
 
-  const templeArmGeo = new THREE.BoxGeometry(0.024, 0.032, 0.95);
-
-  const leftArm = new THREE.Mesh(templeArmGeo, frameMat);
-  leftArm.position.set(0.66, 1.30, 0.65);
-  leftArm.rotation.y = -0.10;
-  group.add(leftArm);
-
-  const rightArm = new THREE.Mesh(templeArmGeo, frameMat);
-  rightArm.position.set(-0.66, 1.30, 0.65);
-  rightArm.rotation.y = 0.10;
-  group.add(rightArm);
-
+  // Front corner rivet pins
   const pinGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.028, 8);
   const leftPin = new THREE.Mesh(pinGeo, silverRivetsMat);
   leftPin.rotation.x = Math.PI / 2;
@@ -331,7 +381,7 @@ function createOversizedGlasses(): THREE.Group {
  * - Left ear:
  *   1. 1st lobe: bottom lobe
  *   2. 2nd lobe: above 1st lobe along outer ear rim
- *   3. Conch: compact hoop (radius 0.046) hugging the ear helix cartilage
+ *   3. Conch: compact hoop hugging the ear helix cartilage
  * - Right ear:
  *   1. 1st lobe: bottom lobe
  */
@@ -354,23 +404,23 @@ function createEarrings(): THREE.Group {
 
   // --- LEFT EAR (x > 0) ---
   const left1stLobe = makeHoop(0.065, 0.011);
-  left1stLobe.position.set(1.03, 0.79, 0.28);
+  left1stLobe.position.set(1.00, 0.81, 0.15);
   left1stLobe.rotation.set(0.15, 1.50, 0);
   group.add(left1stLobe);
 
   const left2ndLobe = makeHoop(0.054, 0.0095);
-  left2ndLobe.position.set(1.07, 0.84, 0.26);
+  left2ndLobe.position.set(1.04, 0.88, 0.10);
   left2ndLobe.rotation.set(0.10, 1.45, 0.15);
   group.add(left2ndLobe);
 
   const leftConch = makeHoop(0.046, 0.009);
-  leftConch.position.set(1.138, 0.99, 0.232);
+  leftConch.position.set(1.08, 1.04, 0.05);
   leftConch.rotation.set(Math.PI / 2 - 0.16, 0.15, -0.22);
   group.add(leftConch);
 
   // --- RIGHT EAR (x < 0) ---
   const right1stLobe = makeHoop(0.065, 0.011);
-  right1stLobe.position.set(-1.03, 0.79, 0.28);
+  right1stLobe.position.set(-1.00, 0.81, 0.15);
   right1stLobe.rotation.set(0.15, -1.50, 0);
   group.add(right1stLobe);
 

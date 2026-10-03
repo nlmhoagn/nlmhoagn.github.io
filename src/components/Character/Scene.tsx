@@ -71,10 +71,8 @@ const Scene = () => {
             headBone = character.getObjectByName("spine006") || null;
             screenLight = character.getObjectByName("screenlight") || null;
             progress.loaded().then(() => {
-              setTimeout(() => {
-                light.turnOnLights();
-                animations.startIntro();
-              }, 2500);
+              light.turnOnLights();
+              animations.startIntro();
             });
             window.addEventListener("resize", () =>
               handleResize(renderer, camera, canvasDiv, character)
@@ -144,7 +142,7 @@ const Scene = () => {
           );
           light.setPointLight(screenLight);
         }
-        const delta = Math.min(clock.getDelta(), 0.05);
+        const delta = Math.min(clock.getDelta(), 0.033);
         if (mixer) {
           mixer.update(delta);
         }
