@@ -47,13 +47,6 @@ const Navbar = () => {
         <a href="/#" className="navbar-title" data-cursor="disable">
           NLMH
         </a>
-        <a
-          href="mailto:hoang.nguyen102@hcmut.edu.vn"
-          className="navbar-connect"
-          data-cursor="disable"
-        >
-          hoang.nguyen102@hcmut.edu.vn
-        </a>
         <ul>
           <li>
             <a data-href="#about" href="#about">
