@@ -359,7 +359,7 @@ function createEarrings(): THREE.Group {
   group.add(left1stLobe);
 
   const left2ndLobe = makeHoop(0.054, 0.0095);
-  left2ndLobe.position.set(1.07, 0.89, 0.26);
+  left2ndLobe.position.set(1.07, 0.84, 0.26);
   left2ndLobe.rotation.set(0.10, 1.45, 0.15);
   group.add(left2ndLobe);
 
