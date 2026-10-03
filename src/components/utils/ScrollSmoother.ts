@@ -38,8 +38,24 @@ export class ScrollSmoother {
       };
       gsap.ticker.add(this.tickerFn);
       gsap.ticker.lagSmoothing(500, 33);
+
+      if (typeof ResizeObserver !== "undefined") {
+        this.resizeObserver = new ResizeObserver(() => {
+          this.lenis?.resize();
+          ScrollTrigger.refresh();
+        });
+        const target =
+          typeof _config?.content === "string"
+            ? document.querySelector(_config.content)
+            : _config?.content || document.getElementById("smooth-content") || document.body;
+        if (target) {
+          this.resizeObserver.observe(target);
+        }
+      }
     }
   }
+
+  private resizeObserver: ResizeObserver | null = null;
 
   static create(config?: ScrollSmootherConfig): ScrollSmoother {
     if (ScrollSmoother.instance) {
@@ -54,6 +70,12 @@ export class ScrollSmoother {
   }
 
   static refresh(..._args: unknown[]) {
+    ScrollSmoother.instance?.lenis?.resize();
+    ScrollTrigger.refresh();
+  }
+
+  resize() {
+    this.lenis?.resize();
     ScrollTrigger.refresh();
   }
 
@@ -104,11 +126,14 @@ export class ScrollSmoother {
   }
 
   kill() {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     if (this.tickerFn) {
       gsap.ticker.remove(this.tickerFn);
     }
     this.lenis?.destroy();
     this.lenis = null;
+    ScrollSmoother.instance = null;
   }
 }
 
