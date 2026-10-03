@@ -307,8 +307,8 @@ h2.landing-info-h2 {
   }
   .landing-intro {
     top: 50%;
-    left: auto;
-    right: 66%;
+    left: 0;
+    right: auto;
     transform: translate(0%, -50%);
   }
 
@@ -318,15 +318,15 @@ h2.landing-info-h2 {
     z-index: inherit;
     text-align: left;
     transform: translate(0%, -50%);
-    right: auto;
-    left: 66%;
+    right: 0;
+    left: auto;
   }
 }
 @media screen and (min-width: 1200px) {
   .landing-intro {
     top: 50%;
-    left: auto;
-    right: 70%;
+    left: 0;
+    right: auto;
     transform: translate(0%, -50%);
   }
 
@@ -336,8 +336,8 @@ h2.landing-info-h2 {
     z-index: inherit;
     text-align: left;
     transform: translate(0%, -50%);
-    right: auto;
-    left: 70%;
+    right: 0;
+    left: auto;
   }
 }
 @media screen and (min-width: 1600px) {
