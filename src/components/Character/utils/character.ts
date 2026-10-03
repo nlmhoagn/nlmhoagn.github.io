@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { DRACOLoader, GLTF, GLTFLoader } from "three-stdlib";
 import { setCharTimeline, setAllTimeline } from "../../utils/GsapScroll";
 import { decryptFile } from "./decrypt";
+import { customizeCharacter } from "./customizeCharacter";
 
 const BASE_URL = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
@@ -34,6 +35,7 @@ const setCharacter = (
           blobUrl,
           async (gltf) => {
             const character = gltf.scene;
+            customizeCharacter(character);
             await renderer.compileAsync(character, camera, scene);
             character.traverse((child: THREE.Object3D) => {
               if ((child as THREE.Mesh).isMesh) {
