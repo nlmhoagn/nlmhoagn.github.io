@@ -5,17 +5,14 @@ const BASE_URL = import.meta.env.BASE_URL.endsWith("/")
   : import.meta.env.BASE_URL + "/";
 
 /**
- * Customizes the 3D character to authentically and handsomely match Hoang Nguyen:
- * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth (sculpted nose, lips, jawline)
+ * Customizes the 3D character to authentically match Hoang Nguyen:
+ * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
  * 2. Solid matte black crewneck T-shirt (ao thun den)
- * 3. Realistic human-proportioned ears (completely hides the cartoon dumbo ears)
- * 4. Realistic Asian eyes:
+ * 3. Clean natural original haircut (bo luon mai di)
+ * 4. Realistic human-proportioned ears (completely hides cartoon dumbo ears)
+ * 5. Realistic Asian eyes:
  *    - Crisp, radiant white sclera (trong trang mat)
  *    - Natural deep espresso brown iris with black pupil
- * 5. Authentic Korean Two-Block haircut:
- *    - Curving curtain bangs parted near center with forehead gap
- *    - Cascading soft layered locks that graze eyebrows and touch the top glasses rim
- *    - Sleek temple locks and volumetric crown volume
  * 6. Fashionable oversized clear acetate glasses:
  *    - Oversized Pantos / Wellington shape (soft curved rounded bottom, never boxy/square)
  *    - Translucent clear crystal acetate frame with glossy reflections and silver rivets
@@ -36,9 +33,9 @@ export function customizeCharacter(character: THREE.Object3D) {
 
   // 2. Refine eyebrow bones (make them sleek and natural, not giant cartoon caterpillars)
   const browL = character.getObjectByName("eyebrow_L");
-  if (browL) browL.scale.set(0.65, 0.45, 0.65);
+  if (browL) browL.scale.set(0.70, 0.55, 0.70);
   const browR = character.getObjectByName("eyebrow_R");
-  if (browR) browR.scale.set(0.65, 0.45, 0.65);
+  if (browR) browR.scale.set(0.70, 0.55, 0.70);
 
   // Load custom Asian eye texture (bright white sclera, natural dark brown iris)
   const textureLoader = new THREE.TextureLoader();
@@ -63,7 +60,7 @@ export function customizeCharacter(character: THREE.Object3D) {
           roughness: 0.44,
           metalness: 0.0,
           emissive: skinEmissive,
-          emissiveIntensity: 0.22, // Radiant fair skin that keeps 3D nose, lips, and jaw shadows visible
+          emissiveIntensity: 0.20, // Radiant fair skin that keeps 3D nose, lips, and jaw shadows visible
         });
       } else if (name.includes("Ear")) {
         // Completely hide the cartoon dumbo ears!
@@ -116,10 +113,6 @@ export function customizeCharacter(character: THREE.Object3D) {
   const realisticEars = createRealisticEars(skinColor, skinEmissive);
   headBone.add(realisticEars);
 
-  // Add Korean Two-Block sleek curtain bangs touching eyebrows
-  const bangs = createTwoBlockCurtainBangs(hairColor);
-  headBone.add(bangs);
-
   // Add oversized clear acetate glasses
   const glasses = createOversizedGlasses();
   headBone.add(glasses);
@@ -147,7 +140,7 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
     roughness: 0.44,
     metalness: 0.0,
     emissive: skinEmissive,
-    emissiveIntensity: 0.22,
+    emissiveIntensity: 0.20,
     side: THREE.DoubleSide,
   });
 
@@ -192,147 +185,11 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
 }
 
 /**
- * Creates authentic Korean Two-Block haircut matching user's photo:
- * - Natural 5:5 middle-part curtain bangs
- * - Hugs the forehead contour smoothly and drapes down to graze the eyebrows
- * - Soft layered locks sweeping outward toward temples
- * - Volumetric crown blending seamlessly into top of head
- */
-function createTwoBlockCurtainBangs(baseHairColor: THREE.Color): THREE.Group {
-  const group = new THREE.Group();
-  group.name = "hoangTwoBlockCurtainBangs";
-
-  const hairMat = new THREE.MeshStandardMaterial({
-    color: baseHairColor,
-    roughness: 0.58,
-    metalness: 0.06,
-  });
-
-  const hairHighlightMat = new THREE.MeshStandardMaterial({
-    color: "#222028",
-    roughness: 0.50,
-    metalness: 0.08,
-  });
-
-  function makeLock(points: THREE.Vector3[], radius: number, material: THREE.Material = hairMat) {
-    const curve = new THREE.CatmullRomCurve3(points);
-    const geom = new THREE.TubeGeometry(curve, 20, radius, 8, false);
-    return new THREE.Mesh(geom, material);
-  }
-
-  // --- LEFT CURTAIN (x > 0) ---
-  // Lock 1: Center parting inner strand, falls straight then soft flick outward
-  group.add(makeLock([
-    new THREE.Vector3(0.03, 1.98, 1.04),
-    new THREE.Vector3(0.05, 1.82, 1.08),
-    new THREE.Vector3(0.09, 1.64, 1.10),
-    new THREE.Vector3(0.14, 1.48, 1.11),
-    new THREE.Vector3(0.18, 1.42, 1.09),
-  ], 0.032, hairHighlightMat));
-
-  // Lock 2: Mid-inner drape, covering mid-forehead down to eyebrow
-  group.add(makeLock([
-    new THREE.Vector3(0.10, 1.98, 1.02),
-    new THREE.Vector3(0.14, 1.80, 1.08),
-    new THREE.Vector3(0.20, 1.62, 1.10),
-    new THREE.Vector3(0.26, 1.47, 1.11),
-    new THREE.Vector3(0.31, 1.41, 1.09),
-  ], 0.035, hairMat));
-
-  // Lock 3: Main body of curtain, sweeping down and slightly outward
-  group.add(makeLock([
-    new THREE.Vector3(0.20, 1.96, 0.99),
-    new THREE.Vector3(0.26, 1.78, 1.06),
-    new THREE.Vector3(0.33, 1.58, 1.08),
-    new THREE.Vector3(0.39, 1.46, 1.09),
-    new THREE.Vector3(0.44, 1.40, 1.06),
-  ], 0.036, hairHighlightMat));
-
-  // Lock 4: Outer temple sweep, framing the cheekbone and temple
-  group.add(makeLock([
-    new THREE.Vector3(0.30, 1.94, 0.94),
-    new THREE.Vector3(0.40, 1.74, 1.02),
-    new THREE.Vector3(0.50, 1.54, 1.03),
-    new THREE.Vector3(0.58, 1.40, 0.98),
-    new THREE.Vector3(0.64, 1.30, 0.88),
-  ], 0.036, hairMat));
-
-  // Lock 5: Sideburn lock framing in front of the left ear
-  group.add(makeLock([
-    new THREE.Vector3(0.45, 1.86, 0.88),
-    new THREE.Vector3(0.58, 1.62, 0.93),
-    new THREE.Vector3(0.68, 1.38, 0.82),
-    new THREE.Vector3(0.76, 1.15, 0.62),
-    new THREE.Vector3(0.80, 0.98, 0.44),
-  ], 0.034, hairMat));
-
-  // --- RIGHT CURTAIN (x < 0) ---
-  // Lock 1: Center parting inner strand
-  group.add(makeLock([
-    new THREE.Vector3(-0.03, 1.98, 1.04),
-    new THREE.Vector3(-0.05, 1.82, 1.08),
-    new THREE.Vector3(-0.09, 1.64, 1.10),
-    new THREE.Vector3(-0.14, 1.48, 1.11),
-    new THREE.Vector3(-0.18, 1.42, 1.09),
-  ], 0.032, hairHighlightMat));
-
-  // Lock 2: Mid-inner drape
-  group.add(makeLock([
-    new THREE.Vector3(-0.10, 1.98, 1.02),
-    new THREE.Vector3(-0.14, 1.80, 1.08),
-    new THREE.Vector3(-0.20, 1.62, 1.10),
-    new THREE.Vector3(-0.26, 1.47, 1.11),
-    new THREE.Vector3(-0.31, 1.41, 1.09),
-  ], 0.035, hairMat));
-
-  // Lock 3: Main body of curtain
-  group.add(makeLock([
-    new THREE.Vector3(-0.20, 1.96, 0.99),
-    new THREE.Vector3(-0.26, 1.78, 1.06),
-    new THREE.Vector3(-0.33, 1.58, 1.08),
-    new THREE.Vector3(-0.39, 1.46, 1.09),
-    new THREE.Vector3(-0.44, 1.40, 1.06),
-  ], 0.036, hairHighlightMat));
-
-  // Lock 4: Outer temple sweep
-  group.add(makeLock([
-    new THREE.Vector3(-0.30, 1.94, 0.94),
-    new THREE.Vector3(-0.40, 1.74, 1.02),
-    new THREE.Vector3(-0.50, 1.54, 1.03),
-    new THREE.Vector3(-0.58, 1.40, 0.98),
-    new THREE.Vector3(-0.64, 1.30, 0.88),
-  ], 0.036, hairMat));
-
-  // Lock 5: Sideburn lock framing in front of the right ear
-  group.add(makeLock([
-    new THREE.Vector3(-0.45, 1.86, 0.88),
-    new THREE.Vector3(-0.68, 1.38, 0.82),
-    new THREE.Vector3(-0.76, 1.15, 0.62),
-    new THREE.Vector3(-0.80, 0.98, 0.44),
-  ], 0.034, hairMat));
-
-  // --- CROWN ARCH (Top of head volume) ---
-  const crownCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.60, 1.92, 0.80),
-    new THREE.Vector3(-0.32, 2.03, 0.96),
-    new THREE.Vector3(0.00, 2.06, 1.01),
-    new THREE.Vector3(0.32, 2.03, 0.96),
-    new THREE.Vector3(0.60, 1.92, 0.80),
-  ]);
-  group.add(new THREE.Mesh(
-    new THREE.TubeGeometry(crownCurve, 20, 0.060, 8, false),
-    hairMat
-  ));
-
-  return group;
-}
-
-/**
  * Creates fashionable oversized clear acetate glasses matching user's photo:
  * - Generous proportions: width 0.58, height 0.46
  * - Distinctive soft rounded pantos bottom (eliminating boxiness/squareness)
  * - Translucent crystal clear acetate frame with glossy reflections and silver rivets
- * - Centered right over eye pupils, top rim resting comfortably under bangs
+ * - Centered right over eye pupils
  */
 function createOversizedGlasses(): THREE.Group {
   const group = new THREE.Group();
