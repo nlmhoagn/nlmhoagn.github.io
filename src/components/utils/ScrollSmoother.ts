@@ -18,14 +18,15 @@ export class ScrollSmoother {
   private tickerFn: ((time: number) => void) | null = null;
   private static instance: ScrollSmoother | null = null;
 
-  constructor(config?: ScrollSmootherConfig) {
+  constructor(_config?: ScrollSmootherConfig) {
     if (typeof window !== "undefined") {
       this.lenis = new Lenis({
-        duration: config?.smooth ? Math.min(config.smooth, 1.4) : 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        lerp: 0.1,
         orientation: "vertical",
         gestureOrientation: "vertical",
         smoothWheel: true,
+        wheelMultiplier: 1.0,
+        touchMultiplier: 1.2,
       });
 
       this.lenis.on("scroll", () => {
@@ -36,7 +37,7 @@ export class ScrollSmoother {
         this.lenis?.raf(time * 1000);
       };
       gsap.ticker.add(this.tickerFn);
-      gsap.ticker.lagSmoothing(0);
+      gsap.ticker.lagSmoothing(500, 33);
     }
   }
 

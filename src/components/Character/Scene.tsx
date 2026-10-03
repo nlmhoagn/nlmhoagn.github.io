@@ -30,9 +30,10 @@ const Scene = () => {
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
+        powerPreference: "high-performance",
       });
       renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
       canvasDiv.current.appendChild(renderer.domElement);
@@ -107,16 +108,28 @@ const Scene = () => {
         });
       };
 
-      document.addEventListener("mousemove", (event) => {
-        onMouseMove(event);
-      });
+      document.addEventListener("mousemove", onMouseMove);
       const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) {
         landingDiv.addEventListener("touchstart", onTouchStart);
         landingDiv.addEventListener("touchend", onTouchEnd);
       }
+
+      let isVisible = true;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible = entry.isIntersecting;
+        },
+        { rootMargin: "300px" }
+      );
+      if (canvasDiv.current) {
+        observer.observe(canvasDiv.current);
+      }
+
+      let animId: number;
       const animate = () => {
-        requestAnimationFrame(animate);
+        animId = requestAnimationFrame(animate);
+        if (!isVisible) return;
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -135,18 +148,22 @@ const Scene = () => {
         renderer.render(scene, camera);
       };
       animate();
+
+      const containerEl = canvasDiv.current;
       return () => {
+        cancelAnimationFrame(animId);
+        observer.disconnect();
         clearTimeout(debounce);
         scene.clear();
         renderer.dispose();
         window.removeEventListener("resize", () =>
           handleResize(renderer, camera, canvasDiv, character!)
         );
-        if (canvasDiv.current) {
-          canvasDiv.current.removeChild(renderer.domElement);
+        if (containerEl && containerEl.contains(renderer.domElement)) {
+          containerEl.removeChild(renderer.domElement);
         }
+        document.removeEventListener("mousemove", onMouseMove);
         if (landingDiv) {
-          document.removeEventListener("mousemove", onMouseMove);
           landingDiv.removeEventListener("touchstart", onTouchStart);
           landingDiv.removeEventListener("touchend", onTouchEnd);
         }

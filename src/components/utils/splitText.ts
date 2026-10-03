@@ -51,7 +51,11 @@ export class SplitText {
 
     rawElements.forEach((el) => {
       this.originalContent.set(el, el.innerHTML);
-      const text = el.textContent || "";
+
+      // Clone element to convert <br> into newlines before reading text
+      const clone = el.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
+      const rawText = clone.textContent || "";
       el.innerHTML = "";
 
       if (linesClass) {
@@ -60,56 +64,58 @@ export class SplitText {
 
       this.lines.push(el);
 
-      if (type.includes("words") && !type.includes("chars")) {
-        // Words only
-        const words = text.trim().split(/\s+/);
-        words.forEach((w, i) => {
-          const wordSpan = document.createElement("span");
-          wordSpan.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
-          wordSpan.style.display = "inline-block";
-          wordSpan.textContent = w;
-          el.appendChild(wordSpan);
-          this.words.push(wordSpan);
+      const lines = rawText.split("\n");
+      lines.forEach((lineText, lineIdx) => {
+        if (lineIdx > 0) {
+          el.appendChild(document.createElement("br"));
+        }
 
-          if (i < words.length - 1) {
-            el.appendChild(document.createTextNode(" "));
-          }
-        });
-      } else {
-        // Chars & words
-        const words = text.split(" ");
-        words.forEach((word, wIdx) => {
-          if (word.length === 0 && wIdx < words.length - 1) {
-            el.appendChild(document.createTextNode(" "));
-            return;
-          }
+        if (type.includes("words") && !type.includes("chars")) {
+          // Words only
+          const words = lineText.trim().split(/\s+/).filter(Boolean);
+          words.forEach((w, i) => {
+            const wordSpan = document.createElement("span");
+            wordSpan.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
+            wordSpan.style.display = "inline-block";
+            wordSpan.textContent = w;
+            el.appendChild(wordSpan);
+            this.words.push(wordSpan);
 
-          const wordWrap = document.createElement("span");
-          wordWrap.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
-          wordWrap.style.display = "inline-block";
-          wordWrap.style.whiteSpace = "nowrap";
+            if (i < words.length - 1) {
+              el.appendChild(document.createTextNode(" "));
+            }
+          });
+        } else {
+          // Chars & words
+          const words = lineText.trim().split(/\s+/).filter(Boolean);
+          words.forEach((word, wIdx) => {
+            const wordWrap = document.createElement("span");
+            wordWrap.className = wordsClass ? `split-word ${wordsClass}` : "split-word";
+            wordWrap.style.display = "inline-block";
+            wordWrap.style.whiteSpace = "nowrap";
 
-          for (let c = 0; c < word.length; c++) {
-            const charSpan = document.createElement("span");
-            charSpan.className = charsClass ? `split-char ${charsClass}` : "split-char";
-            charSpan.style.display = "inline-block";
-            charSpan.textContent = word[c];
-            wordWrap.appendChild(charSpan);
-            this.chars.push(charSpan);
-          }
+            for (let c = 0; c < word.length; c++) {
+              const charSpan = document.createElement("span");
+              charSpan.className = charsClass ? `split-char ${charsClass}` : "split-char";
+              charSpan.style.display = "inline-block";
+              charSpan.textContent = word[c];
+              wordWrap.appendChild(charSpan);
+              this.chars.push(charSpan);
+            }
 
-          el.appendChild(wordWrap);
-          this.words.push(wordWrap);
+            el.appendChild(wordWrap);
+            this.words.push(wordWrap);
 
-          if (wIdx < words.length - 1) {
-            const spaceSpan = document.createElement("span");
-            spaceSpan.className = "split-space";
-            spaceSpan.style.display = "inline-block";
-            spaceSpan.innerHTML = "&nbsp;";
-            el.appendChild(spaceSpan);
-          }
-        });
-      }
+            if (wIdx < words.length - 1) {
+              const spaceSpan = document.createElement("span");
+              spaceSpan.className = "split-space";
+              spaceSpan.style.display = "inline-block";
+              spaceSpan.innerHTML = "&nbsp;";
+              el.appendChild(spaceSpan);
+            }
+          });
+        }
+      });
     });
   }
 

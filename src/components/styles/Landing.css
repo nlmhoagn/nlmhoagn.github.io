@@ -103,7 +103,9 @@
   position: absolute;
   max-width: 1920px;
   max-height: 1080px;
-  transform: translateX(-50%);
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
   width: 100%;
   left: 50%;
   z-index: 0;
