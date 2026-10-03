@@ -7,6 +7,7 @@ import "./styles/SocialIcons.css";
 import { TbNotes } from "react-icons/tb";
 import { useEffect } from "react";
 import HoverLinks from "./HoverLinks";
+import { PRIVACY_CONFIG } from "../config/privacy";
 
 const SocialIcons = () => {
   useEffect(() => {
@@ -74,12 +75,14 @@ const SocialIcons = () => {
           </a>
         </span>
       </div>
-      <a className="resume-button" href="./resume.html" target="_blank" rel="noreferrer">
-        <HoverLinks text="RESUME" />
-        <span>
-          <TbNotes />
-        </span>
-      </a>
+      {!PRIVACY_CONFIG.hideResume && (
+        <a className="resume-button" href="./resume.html" target="_blank" rel="noreferrer">
+          <HoverLinks text="RESUME" />
+          <span>
+            <TbNotes />
+          </span>
+        </a>
+      )}
     </div>
   );
 };

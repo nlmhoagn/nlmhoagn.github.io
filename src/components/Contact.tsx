@@ -1,5 +1,6 @@
 import { MdArrowOutward, MdCopyright } from "react-icons/md";
 import "./styles/Contact.css";
+import { PRIVACY_CONFIG } from "../config/privacy";
 
 const Contact = () => {
   return (
@@ -65,14 +66,16 @@ const Contact = () => {
             >
               Instagram <MdArrowOutward />
             </a>
-            <a
-              href="./resume.html"
-              target="_blank"
-              data-cursor="disable"
-              className="contact-social"
-            >
-              Resume / CV <MdArrowOutward />
-            </a>
+            {!PRIVACY_CONFIG.hideResume && (
+              <a
+                href="./resume.html"
+                target="_blank"
+                data-cursor="disable"
+                className="contact-social"
+              >
+                Resume / CV <MdArrowOutward />
+              </a>
+            )}
           </div>
           <div className="contact-box">
             <h2>

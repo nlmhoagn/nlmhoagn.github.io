@@ -9,6 +9,7 @@ import SocialIcons from "./SocialIcons";
 import WhatIDo from "./WhatIDo";
 import Work from "./Work";
 import setSplitText from "./utils/splitText";
+import { PRIVACY_CONFIG } from "../config/privacy";
 
 const TechStack = lazy(() => import("./TechStack"));
 
@@ -42,7 +43,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
             <About />
             <WhatIDo />
             <Career />
-            <Work />
+            {!PRIVACY_CONFIG.hideWork && <Work />}
             {isDesktopView && (
               <Suspense fallback={<div>Loading....</div>}>
                 <TechStack />

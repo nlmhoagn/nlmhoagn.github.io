@@ -27,3 +27,8 @@ dist-ssr
 
 backup/
 .env
+
+# Private local data (Work & Resume backup)
+private/
+local_private/
+*.private.*

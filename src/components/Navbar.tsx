@@ -5,6 +5,8 @@ import { gsap } from "gsap";
 import { ScrollSmoother } from "./utils/ScrollSmoother";
 import "./styles/Navbar.css";
 
+import { PRIVACY_CONFIG } from "../config/privacy";
+
 gsap.registerPlugin(ScrollTrigger);
 export let smoother: ScrollSmoother;
 
@@ -63,11 +65,13 @@ const Navbar = () => {
               <HoverLinks text="CAREER" />
             </a>
           </li>
-          <li>
-            <a data-href="#work" href="#work">
-              <HoverLinks text="WORK" />
-            </a>
-          </li>
+          {!PRIVACY_CONFIG.hideWork && (
+            <li>
+              <a data-href="#work" href="#work">
+                <HoverLinks text="WORK" />
+              </a>
+            </li>
+          )}
           <li>
             <a data-href="#contact" href="#contact">
               <HoverLinks text="CONTACT" />
