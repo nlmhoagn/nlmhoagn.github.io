@@ -328,12 +328,12 @@ function createOversizedGlasses(): THREE.Group {
 
 /**
  * Creates silver hoop earrings matching user's exact specification:
- * - Tai trái:
- *   1. 1st lobe: dưới cùng dái tai
- *   2. 2nd lobe: trên 1st lobe dọc vành dái tai
- *   3. Conch: nhỏ gọn (radius 0.046), ôm khít bo tròn phần viền sụn nổi lên của tai
- * - Tai phải:
- *   1. 1st lobe: dưới cùng dái tai
+ * - Left ear:
+ *   1. 1st lobe: bottom lobe
+ *   2. 2nd lobe: above 1st lobe along outer ear rim
+ *   3. Conch: compact hoop (radius 0.046) hugging the ear helix cartilage
+ * - Right ear:
+ *   1. 1st lobe: bottom lobe
  */
 function createEarrings(): THREE.Group {
   const group = new THREE.Group();
@@ -352,7 +352,7 @@ function createEarrings(): THREE.Group {
     return new THREE.Mesh(geo, silverMat);
   }
 
-  // --- TAI TRÁI (LEFT EAR, x > 0) ---
+  // --- LEFT EAR (x > 0) ---
   const left1stLobe = makeHoop(0.065, 0.011);
   left1stLobe.position.set(1.03, 0.79, 0.28);
   left1stLobe.rotation.set(0.15, 1.50, 0);
@@ -368,7 +368,7 @@ function createEarrings(): THREE.Group {
   leftConch.rotation.set(Math.PI / 2 - 0.16, 0.15, -0.22);
   group.add(leftConch);
 
-  // --- TAI PHẢI (RIGHT EAR, x < 0) ---
+  // --- RIGHT EAR (x < 0) ---
   const right1stLobe = makeHoop(0.065, 0.011);
   right1stLobe.position.set(-1.03, 0.79, 0.28);
   right1stLobe.rotation.set(0.15, -1.50, 0);

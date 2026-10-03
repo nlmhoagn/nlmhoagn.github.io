@@ -25,8 +25,7 @@ const Career = () => {
                 <h3>2026</h3>
               </div>
               <p>
-                Applied Cryptography and Computer Vision Lab at HCMUT.
-                Phòng thí nghiệm nghiên cứu chuyên sâu về Mật mã Ứng dụng, Thị giác Máy tính và các giải pháp Trí tuệ Nhân tạo Biên (Edge AI) trực thuộc Trường Đại học Bách Khoa – ĐHQG TP.HCM.
+                Applied Cryptography and Computer Vision Lab at Ho Chi Minh City University of Technology (HCMUT). Research laboratory specializing in Applied Cryptography, Computer Vision, and Edge AI solutions.
                 <br />
                 <a
                   href="https://www.facebook.com/aclabhcumt/"
@@ -34,7 +33,7 @@ const Career = () => {
                   rel="noreferrer"
                   className="career-link"
                 >
-                  Facebook <MdArrowOutward />
+                  ACLab Facebook <MdArrowOutward />
                 </a>
               </p>
             </div>
@@ -48,8 +47,7 @@ const Career = () => {
                 <h3>2026</h3>
               </div>
               <p>
-                Ubiquitous, Resilient &amp; Autonomous Systems Research Group at HCMUT.
-                Nhóm nghiên cứu trọng điểm tập trung vào các hệ thống thông minh tự hành (Autonomous Systems), IoT phân tán, mạng không dây và thiết bị bay không người lái (UAV) tại Trường Đại học Bách Khoa – ĐHQG TP.HCM.
+                Ubiquitous, Resilient &amp; Autonomous Systems Research Group at Ho Chi Minh City University of Technology (HCMUT). Research group focusing on autonomous intelligent systems, distributed IoT, wireless networking, and unmanned aerial vehicles (UAVs).
                 <br />
                 <a
                   href="https://ura.hcmut.edu.vn/"
@@ -84,8 +82,9 @@ const Career = () => {
                 <h3>NOW</h3>
               </div>
               <p>
-                Trường Đại học Bách Khoa – ĐHQG TP.HCM (2022 – Hiện tại).
-                Cumulative GPA: 4.00/4.00 (9.33/10.00). Đạt Học bổng Khuyến khích Học tập loại Xuất sắc (Tier 1), Học kỳ 1, năm học 2025–2026. Định hướng chuyên sâu: Edge AI, Computer Vision và Hệ thống Nhúng.
+                Ho Chi Minh City University of Technology – VNU-HCM (2022 – Present).
+                <br />
+                Cumulative GPA: 4.00/4.00 (9.33/10.00). Awarded Academic Encouragement Scholarship (Tier 1 - Excellent), Semester 1, Academic Year 2025–2026. Specialization: Edge AI, Computer Vision, and Embedded Systems.
               </p>
             </div>
 
@@ -98,8 +97,9 @@ const Career = () => {
                 <h3>2022</h3>
               </div>
               <p>
-                Trường Phổ thông Năng khiếu – Đại học Quốc gia TP.HCM (2019 – 2022).
-                Tốt nghiệp khối chuyên với nền tảng vững vàng về toán học giải tích, cấu trúc dữ liệu thuật toán và lập trình khoa học máy tính.
+                High School for the Gifted – Vietnam National University HCMC (2019 – 2022).
+                <br />
+                Graduated with honors, establishing a rigorous foundation in mathematical analysis, algorithmic data structures, and computer science.
               </p>
             </div>
           </div>
