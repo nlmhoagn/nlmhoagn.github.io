@@ -372,10 +372,10 @@ function createEarrings(): THREE.Group {
   left2ndLobe.rotation.set(0.10, 1.45, 0.15);
   group.add(left2ndLobe);
 
-  // 3. Left Conch (vòng sụn conch ôm qua vành tai giữa)
-  const leftConch = makeHoop(0.075, 0.011);
-  leftConch.position.set(1.09, 1.06, 0.24);
-  leftConch.rotation.set(-0.25, 1.25, 0.20);
+  // 3. Left Conch (vòng sụn conch ôm qua vành tai giữa vào lòng tai chuẩn theo ảnh)
+  const leftConch = makeHoop(0.074, 0.013);
+  leftConch.position.set(1.10, 1.00, 0.25);
+  leftConch.rotation.set(Math.PI / 2 - 0.22, 0.18, -0.32);
   group.add(leftConch);
 
   // --- TAI PHẢI (RIGHT EAR, x < 0) ---
