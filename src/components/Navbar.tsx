@@ -46,11 +46,11 @@ const Navbar = () => {
           NLMH
         </a>
         <a
-          href="mailto:nlmhoangdt@gmail.com"
+          href="mailto:hoang.nguyen102@hcmut.edu.vn"
           className="navbar-connect"
           data-cursor="disable"
         >
-          nlmhoangdt@gmail.com
+          hoang.nguyen102@hcmut.edu.vn
         </a>
         <ul>
           <li>

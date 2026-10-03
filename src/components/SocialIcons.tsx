@@ -69,7 +69,7 @@ const SocialIcons = () => {
           </a>
         </span>
         <span>
-          <a href="mailto:nlmhoangdt@gmail.com" title="Email">
+          <a href="mailto:hoang.nguyen102@hcmut.edu.vn" title="Work Email (HCMUT)">
             <FaEnvelope />
           </a>
         </span>

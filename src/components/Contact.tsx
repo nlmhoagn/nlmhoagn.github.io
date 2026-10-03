@@ -8,13 +8,19 @@ const Contact = () => {
         <h3>Contact</h3>
         <div className="contact-flex">
           <div className="contact-box">
-            <h4>Email</h4>
+            <h4>Work / Academic Email</h4>
+            <p>
+              <a href="mailto:hoang.nguyen102@hcmut.edu.vn" data-cursor="disable">
+                hoang.nguyen102@hcmut.edu.vn
+              </a>
+            </p>
+            <h4 style={{ marginTop: "18px" }}>Personal Email</h4>
             <p>
               <a href="mailto:nlmhoangdt@gmail.com" data-cursor="disable">
                 nlmhoangdt@gmail.com
               </a>
             </p>
-            <h4>Phone</h4>
+            <h4 style={{ marginTop: "18px" }}>Phone</h4>
             <p>
               <a href="tel:+84931279469" data-cursor="disable">
                 +84 931 279 469
