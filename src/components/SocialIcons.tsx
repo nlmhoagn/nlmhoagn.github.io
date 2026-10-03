@@ -1,5 +1,6 @@
 import {
   FaGithub,
+  FaLinkedinIn,
   FaEnvelope,
 } from "react-icons/fa6";
 import "./styles/SocialIcons.css";
@@ -63,7 +64,12 @@ const SocialIcons = () => {
           </a>
         </span>
         <span>
-          <a href="mailto:hoang.nguyen102@hcmut.edu.vn" title="Email HCMUT">
+          <a href="https://www.linkedin.com/in/nlmhoagn/" target="_blank" rel="noreferrer" title="LinkedIn">
+            <FaLinkedinIn />
+          </a>
+        </span>
+        <span>
+          <a href="mailto:nlmhoangdt@gmail.com" title="Email">
             <FaEnvelope />
           </a>
         </span>

@@ -214,3 +214,23 @@
     justify-content: left;
   }
 }
+
+.career-block-education {
+  margin-top: 100px;
+}
+
+.career-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accentColor);
+  font-weight: 500;
+  margin-top: 8px;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.career-link:hover {
+  opacity: 0.8;
+}

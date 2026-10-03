@@ -62,9 +62,12 @@ const Scene = () => {
               animations.hover(gltf, hoverDivRef.current);
             }
             mixer = animations.mixer;
+            clock.start();
             const character = gltf.scene;
             setChar(character);
-            scene.add(character);
+            if (!scene.children.includes(character)) {
+              scene.add(character);
+            }
             headBone = character.getObjectByName("spine006") || null;
             screenLight = character.getObjectByName("screenlight") || null;
             progress.loaded().then(() => {
@@ -141,7 +144,7 @@ const Scene = () => {
           );
           light.setPointLight(screenLight);
         }
-        const delta = clock.getDelta();
+        const delta = Math.min(clock.getDelta(), 0.05);
         if (mixer) {
           mixer.update(delta);
         }

@@ -25,25 +25,26 @@
     <text x="14" y="85" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Chunking</text>
     <text x="14" y="112" fill="#64748b" font-size="9" font-family="monospace">Legal Articles</text>
 
-    <!-- Arrow 1 -->
-    <path d="M 120 75 L 140 75" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" />
+    <!-- Fork from Step 1 to Parallel Branches -->
+    <path d="M 115 75 L 130 75 L 145 32" stroke="#38bdf8" stroke-width="1.8" />
+    <path d="M 115 75 L 130 75 L 145 112" stroke="#38bdf8" stroke-width="1.8" />
 
     <!-- Stage 2: Dual Retrieval -->
     <g transform="translate(145, 0)">
       <!-- BM25 Branch -->
-      <rect x="0" y="0" width="125" height="65" rx="8" fill="#1a2540" stroke="#f59e0b" stroke-width="1" />
+      <rect x="0" y="0" width="125" height="65" rx="8" fill="#1a2540" stroke="#f59e0b" stroke-width="1.2" />
       <text x="12" y="25" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">BM25 (Sparse)</text>
       <text x="12" y="48" fill="#cbd5e1" font-size="10" font-family="sans-serif">Exact Keyword Top-K</text>
 
       <!-- Dense Embeddings Branch -->
-      <rect x="0" y="80" width="125" height="65" rx="8" fill="#1a2540" stroke="#38bdf8" stroke-width="1" />
+      <rect x="0" y="80" width="125" height="65" rx="8" fill="#1a2540" stroke="#38bdf8" stroke-width="1.2" />
       <text x="12" y="105" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">Dense Vectors</text>
       <text x="12" y="128" fill="#cbd5e1" font-size="10" font-family="sans-serif">Semantic Similarity</text>
     </g>
 
-    <!-- Arrow 2 Merge -->
-    <path d="M 275 32 L 305 75" stroke="#fbbf24" stroke-width="1.5" />
-    <path d="M 275 112 L 305 75" stroke="#38bdf8" stroke-width="1.5" />
+    <!-- Merge into Step 3 -->
+    <path d="M 270 32 L 292 75 L 315 75" stroke="#fbbf24" stroke-width="1.8" />
+    <path d="M 270 112 L 292 75 L 315 75" stroke="#38bdf8" stroke-width="1.8" />
 
     <!-- Stage 3: Cross-Encoder Reranking -->
     <g transform="translate(315, 20)">
@@ -54,8 +55,8 @@
       <text x="14" y="98" fill="#e879f9" font-size="10" font-family="monospace">Reranker</text>
     </g>
 
-    <!-- Arrow 3 -->
-    <path d="M 435 75 L 455 75" stroke="#a855f7" stroke-width="2" />
+    <!-- Arrow 3 to Output -->
+    <path d="M 430 75 L 460 75" stroke="#a855f7" stroke-width="2" />
 
     <!-- Final Output -->
     <g transform="translate(460, 20)">

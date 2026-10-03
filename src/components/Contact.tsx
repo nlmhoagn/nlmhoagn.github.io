@@ -10,8 +10,8 @@ const Contact = () => {
           <div className="contact-box">
             <h4>Email</h4>
             <p>
-              <a href="mailto:hoang.nguyen102@hcmut.edu.vn" data-cursor="disable">
-                hoang.nguyen102@hcmut.edu.vn
+              <a href="mailto:nlmhoangdt@gmail.com" data-cursor="disable">
+                nlmhoangdt@gmail.com
               </a>
             </p>
             <h4>Phone</h4>
@@ -24,20 +24,40 @@ const Contact = () => {
           <div className="contact-box">
             <h4>Social & Profile</h4>
             <a
+              href="https://www.linkedin.com/in/nlmhoagn/"
+              target="_blank"
+              rel="noreferrer"
+              data-cursor="disable"
+              className="contact-social"
+            >
+              LinkedIn <MdArrowOutward />
+            </a>
+            <a
               href="https://github.com/nlmhoagn"
               target="_blank"
               rel="noreferrer"
               data-cursor="disable"
               className="contact-social"
             >
-              Github <MdArrowOutward />
+              GitHub <MdArrowOutward />
             </a>
             <a
-              href="mailto:hoang.nguyen102@hcmut.edu.vn"
+              href="https://www.facebook.com/nlmhoagn/"
+              target="_blank"
+              rel="noreferrer"
               data-cursor="disable"
               className="contact-social"
             >
-              Email <MdArrowOutward />
+              Facebook <MdArrowOutward />
+            </a>
+            <a
+              href="https://www.instagram.com/nlmhoagn/"
+              target="_blank"
+              rel="noreferrer"
+              data-cursor="disable"
+              className="contact-social"
+            >
+              Instagram <MdArrowOutward />
             </a>
             <a
               href="./resume.html"

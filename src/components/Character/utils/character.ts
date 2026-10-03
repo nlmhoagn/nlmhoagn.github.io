@@ -36,7 +36,7 @@ const setCharacter = (
           async (gltf) => {
             const character = gltf.scene;
             customizeCharacter(character);
-            await renderer.compileAsync(character, camera, scene);
+            scene.add(character);
             character.traverse((child: THREE.Object3D) => {
               if ((child as THREE.Mesh).isMesh) {
                 const mesh = child as THREE.Mesh;
@@ -45,6 +45,9 @@ const setCharacter = (
                 mesh.frustumCulled = true;
               }
             });
+            // Fully compile shaders and pre-warm GPU buffers
+            renderer.compile(scene, camera);
+            renderer.render(scene, camera);
             resolve(gltf);
             setCharTimeline(character, camera);
             setAllTimeline();
