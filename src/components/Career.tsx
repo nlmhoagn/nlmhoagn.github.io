@@ -82,24 +82,22 @@ const Career = () => {
                 <h3>NOW</h3>
               </div>
               <p>
-                Ho Chi Minh City University of Technology – VNU-HCM (2022 – Present).
+                Ho Chi Minh City University of Technology (HCMUT), Vietnam National University Ho Chi Minh City (2025 – 2029).
                 <br />
-                Cumulative GPA: 4.00/4.00 (9.33/10.00). Awarded Academic Encouragement Scholarship (Tier 1 - Excellent), Semester 1, Academic Year 2025–2026. Specialization: Edge AI, Computer Vision, and Embedded Systems.
+                Cumulative GPA: 4.00/4.00 (9.33/10.00). Academic Encouragement Scholarship (Tier 1), Semester 1, Academic Year 2025–2026 (251).
               </p>
             </div>
 
             <div className="career-info-box">
               <div className="career-info-in">
                 <div className="career-role">
-                  <h4>Gifted High School</h4>
-                  <h5>High School for the Gifted (PTNK)</h5>
+                  <h4>High School for the Gifted</h4>
+                  <h5>Vietnam National University Ho Chi Minh City</h5>
                 </div>
-                <h3>2022</h3>
+                <h3>2025</h3>
               </div>
               <p>
-                High School for the Gifted – Vietnam National University HCMC (2019 – 2022).
-                <br />
-                Graduated with honors, establishing a rigorous foundation in mathematical analysis, algorithmic data structures, and computer science.
+                High School for the Gifted, Vietnam National University Ho Chi Minh City (2022 – 2025).
               </p>
             </div>
           </div>
