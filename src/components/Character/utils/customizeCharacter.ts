@@ -3,7 +3,11 @@ import * as THREE from "three";
 /**
  * Customizes the 3D character to authentically match Hoang Nguyen:
  * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
- * 2. Solid matte black crewneck T-shirt (ao thun den)
+ * 2. Athletic street outfit matching user's photo:
+ *    - Dark Navy Blue T-shirt with bold crimson "RED SOX" collegiate graphic on chest
+ *    - Polished sterling silver chain necklace over collar
+ *    - Olive earthy cargo khaki pants
+ *    - Chunky off-white cream sneakers
  * 3. Clean natural original haircut (bo luon mai di)
  * 4. Original animated eyes from GLTF model
  * 5. Realistic human-proportioned ears
@@ -11,18 +15,18 @@ import * as THREE from "three";
  * 7. Polished sterling silver hoop earrings:
  *    - Left ear: 1st lobe, 2nd lobe, and snug outer-rim conch hoop
  *    - Right ear: 1st lobe
- * 8. Seamless, dense golden blonde mullet nape hair:
- *    - Connects directly to the upper black hair mass (no skin gap)
- *    - Cascades down in lush, layered, fine-stranded waves
+ * 8. Seamless, dense golden blonde mullet nape hair connecting directly to upper hair
  */
 export function customizeCharacter(character: THREE.Object3D) {
-  // 1. Color palette tailored to user's photo
+  // 1. Color palette tailored to user's photo (Red Sox navy t-shirt & olive cargo pants)
   const skinColor = new THREE.Color("#fff0e6"); // Fair, healthy, natural Asian skin tone
   const skinEmissive = new THREE.Color("#ffdad0"); // Warm radiant Asian subsurface glow
-  const shirtColor = new THREE.Color("#111113"); // Solid matte black crewneck T-shirt
+  const shirtColor = new THREE.Color("#182030"); // Dark washed navy blue from Red Sox outfit
+  const pantsColor = new THREE.Color("#5a5547"); // Earthy olive cargo khaki pants
+  const shoeColor = new THREE.Color("#dedbd4"); // Off-white cream sneakers
+  const soleColor = new THREE.Color("#d2cfc7"); // Light neutral sneaker soles
   const hairColor = new THREE.Color("#141317"); // Natural silky dark espresso black
   const browColor = new THREE.Color("#1c1a22"); // Refined natural dark eyebrows
-  const pantsColor = new THREE.Color("#18171f"); // Dark denim pants
 
   // 2. Refine eyebrow bones (sleek and natural)
   const browL = character.getObjectByName("eyebrow_L");
@@ -30,7 +34,7 @@ export function customizeCharacter(character: THREE.Object3D) {
   const browR = character.getObjectByName("eyebrow_R");
   if (browR) browR.scale.set(0.70, 0.55, 0.70);
 
-  // 3. Traverse all meshes and assign custom materials (eyes are left as original)
+  // 3. Traverse all meshes and assign custom materials
   character.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh;
@@ -74,6 +78,18 @@ export function customizeCharacter(character: THREE.Object3D) {
       } else if (name.includes("Pant")) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: pantsColor,
+          roughness: 0.88,
+          metalness: 0.02,
+        });
+      } else if (name.includes("Shoe")) {
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: shoeColor,
+          roughness: 0.82,
+          metalness: 0.04,
+        });
+      } else if (name.includes("Sole")) {
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: soleColor,
           roughness: 0.85,
           metalness: 0.02,
         });
@@ -102,6 +118,138 @@ export function customizeCharacter(character: THREE.Object3D) {
   // Add seamless, dense golden blonde mullet nape hair connecting to upper hair
   const blondeNape = createBlondeMulletNape();
   headBone.add(blondeNape);
+
+  // 5. Attach Red Sox graphic and silver chain necklace to chest bone (spine.003)
+  const chestBone =
+    character.getObjectByName("spine003") ||
+    character.getObjectByName("spine.003");
+  if (chestBone) {
+    const chestGraphic = createChestGraphic();
+    chestBone.add(chestGraphic);
+  }
+}
+
+/**
+ * Creates the authentic "RED SOX" athletic chest graphic and silver chain necklace
+ * matching the user's outfit photo.
+ */
+function createChestGraphic(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = "hoangChestOutfit";
+
+  // Create high-res canvas texture for bold athletic "RED SOX" lettering
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const text = "RED SOX";
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height * 0.50;
+
+    // Outer crisp white athletic border
+    ctx.font = "900 135px 'Arial Black', Impact, sans-serif";
+    ctx.lineWidth = 16;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineJoin = "round";
+    ctx.strokeText(text, centerX, centerY);
+
+    // Deep Boston athletic red fill
+    ctx.fillStyle = "#bd1238";
+    ctx.fillText(text, centerX, centerY);
+
+    // Inner bright crimson core for pop
+    ctx.font = "900 130px 'Arial Black', Impact, sans-serif";
+    ctx.fillStyle = "#df1643";
+    ctx.fillText(text, centerX, centerY);
+  }
+
+  const redSoxTexture = new THREE.CanvasTexture(canvas);
+  redSoxTexture.colorSpace = THREE.SRGBColorSpace;
+
+  const decalMat = new THREE.MeshStandardMaterial({
+    map: redSoxTexture,
+    transparent: true,
+    opacity: 0.96,
+    roughness: 0.85,
+    metalness: 0.02,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+
+  // Curved cylindrical surface hugging the chest contour
+  // Width: 1.02, Height: 0.42
+  const uSegments = 16;
+  const vSegments = 8;
+  const geom = new THREE.BufferGeometry();
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  const w = 1.02;
+  const h = 0.42;
+
+  for (let iv = 0; iv <= vSegments; iv++) {
+    const v = iv / vSegments;
+    const y = 0.30 - v * h; // y ranges from 0.30 down to -0.12 in spine.003 local space
+
+    for (let iu = 0; iu <= uSegments; iu++) {
+      const u = iu / uSegments;
+      const x = (u - 0.5) * w;
+      // Hugs chest curve tightly with slight clearance over t-shirt mesh
+      const z = 1.062 - Math.pow(x, 2) * 0.10 - (v * 0.025);
+
+      positions.push(x, y, z);
+      uvs.push(u, 1 - v);
+    }
+  }
+
+  const stride = uSegments + 1;
+  for (let iv = 0; iv < vSegments; iv++) {
+    for (let iu = 0; iu < uSegments; iu++) {
+      const a = iv * stride + iu;
+      const b = (iv + 1) * stride + iu;
+      const c = a + 1;
+      const d = b + 1;
+
+      indices.push(a, b, c);
+      indices.push(c, b, d);
+    }
+  }
+
+  geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geom.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geom.setIndex(indices);
+  geom.computeVertexNormals();
+
+  const textMesh = new THREE.Mesh(geom, decalMat);
+  group.add(textMesh);
+
+  // Silver chain necklace hanging down over the collar as seen in photo
+  const silverChainMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 0.98,
+    roughness: 0.04,
+    emissive: 0x666666,
+    emissiveIntensity: 0.35,
+  });
+
+  const necklaceCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.24, 0.48, 0.99),
+    new THREE.Vector3(0.16, 0.38, 1.03),
+    new THREE.Vector3(0.00, 0.33, 1.06),
+    new THREE.Vector3(-0.16, 0.38, 1.03),
+    new THREE.Vector3(-0.24, 0.48, 0.99),
+  ]);
+  const necklaceGeo = new THREE.TubeGeometry(necklaceCurve, 20, 0.008, 8, false);
+  group.add(new THREE.Mesh(necklaceGeo, silverChainMat));
+
+  return group;
 }
 
 /**
@@ -436,8 +584,6 @@ function createBlondeMulletNape(): THREE.Group {
   }
 
   // --- 0. SEAMLESS CONNECTING ROOT COLLAR (Underlayer bridging black hair directly to mullet) ---
-  // Wraps from behind left ear across back of skull to behind right ear,
-  // starting high at y = 1.28 (tucked under black hair) down to y = 0.65
   function buildConnectingCollar(): THREE.Mesh {
     const uSegments = 24;
     const vSegments = 8;
@@ -453,7 +599,6 @@ function createBlondeMulletNape(): THREE.Group {
 
       for (let iu = 0; iu <= uSegments; iu++) {
         const u = iu / uSegments;
-        // Spans from behind left ear (theta ~ -0.15 rad) around back to behind right ear (theta ~ 3.29 rad)
         const theta = -0.15 + u * (Math.PI + 0.30);
         const x = Math.cos(theta) * rx;
         const z = -Math.sin(theta) * rz;
