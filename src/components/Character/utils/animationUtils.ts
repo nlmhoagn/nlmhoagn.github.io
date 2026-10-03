@@ -104,9 +104,13 @@ const filterAnimationTracks = (
   clip: THREE.AnimationClip,
   boneNames: string[]
 ): THREE.AnimationClip => {
-  const filteredTracks = clip.tracks.filter((track) =>
-    boneNames.some((boneName) => track.name.includes(boneName))
-  );
+  const filteredTracks = clip.tracks.filter((track) => {
+    const cleanTrack = track.name.replace(/[\._]/g, "").toLowerCase();
+    return boneNames.some((boneName) => {
+      const cleanBone = boneName.replace(/[\._]/g, "").toLowerCase();
+      return cleanTrack.includes(cleanBone);
+    });
+  });
 
   return new THREE.AnimationClip(
     clip.name + "_filtered",
