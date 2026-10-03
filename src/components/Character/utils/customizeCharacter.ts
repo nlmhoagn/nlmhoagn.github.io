@@ -18,8 +18,8 @@ export function customizeCharacter(character: THREE.Object3D) {
   // 1. Color palette tailored to user's photo
   const skinColor = new THREE.Color("#fff0e6"); // Fair, healthy, natural Asian skin tone
   const skinEmissive = new THREE.Color("#ffdad0"); // Warm radiant Asian subsurface glow
-  const shirtColor = new THREE.Color("#1d2b45"); // Navy blue plain long-sleeve shirt
-  const pantsColor = new THREE.Color("#5e4e3b"); // Earthy warm brown cargo pants
+  const shirtColor = new THREE.Color("#1c1c20"); // Soft black plain long-sleeve shirt (lightened ~10%)
+  const pantsColor = new THREE.Color("#182844"); // Deep dark blue indigo denim jeans
   const shoeColor = new THREE.Color("#dedbd4"); // Off-white cream sneakers
   const soleColor = new THREE.Color("#d2cfc7"); // Light neutral sneaker soles
   const hairColor = new THREE.Color("#141317"); // Natural silky dark espresso black
