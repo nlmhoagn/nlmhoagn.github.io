@@ -25,7 +25,7 @@ const Career = () => {
                 <h3>2026</h3>
               </div>
               <p>
-                Applied Cryptography and Computer Vision Lab at Ho Chi Minh City University of Technology (HCMUT). Research laboratory specializing in Applied Cryptography, Computer Vision, and Edge AI solutions.
+                Advanced Computing Lab (ACLab) at Ho Chi Minh City University of Technology (HCMUT). Research laboratory specializing in Edge Computing, IoT, Computer Vision, and Hardware Acceleration for intelligent real-world systems.
                 <br />
                 <a
                   href="https://www.facebook.com/aclabhcumt/"
@@ -47,7 +47,7 @@ const Career = () => {
                 <h3>2026</h3>
               </div>
               <p>
-                Ubiquitous, Resilient &amp; Autonomous Systems Research Group at Ho Chi Minh City University of Technology (HCMUT). Research group focusing on autonomous intelligent systems, distributed IoT, wireless networking, and unmanned aerial vehicles (UAVs).
+                Understanding and Reasoning with AI (URA) Research Group at Ho Chi Minh City University of Technology (HCMUT). Academic research team focused on Explainable AI (XAI), Logical Reasoning, Large Language Models (LLMs), and Agentic AI architectures.
                 <br />
                 <a
                   href="https://ura.hcmut.edu.vn/"
