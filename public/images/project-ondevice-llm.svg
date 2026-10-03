@@ -1,0 +1,67 @@
+<svg width="600" height="380" viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#120c1d" />
+      <stop offset="50%" stop-color="#211336" />
+      <stop offset="100%" stop-color="#0c0716" />
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="380" rx="16" fill="url(#bgGrad6)" stroke="#3e2363" stroke-width="1.5" />
+
+  <!-- Top Bar -->
+  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(18, 12, 30, 0.9)" stroke="rgba(255,255,255,0.1)" />
+  <circle cx="48" cy="45" r="5" fill="#a855f7" />
+  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">Advanced Research Interests</text>
+  <rect x="360" y="32" width="200" height="25" rx="6" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="1" />
+  <text x="374" y="49" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">ON-DEVICE LLM & GRAPHS</text>
+
+  <!-- Left: Quantized Neural Weights -->
+  <g transform="translate(45, 95)">
+    <rect width="210" height="170" rx="10" fill="#181026" stroke="#a855f7" stroke-width="1" />
+    <text x="18" y="28" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">QUANTIZED SLM (INT4)</text>
+
+    <!-- Matrix Blocks -->
+    <g transform="translate(18, 45)">
+      <rect x="0" y="0" width="36" height="36" rx="4" fill="#6b21a8" />
+      <rect x="44" y="0" width="36" height="36" rx="4" fill="#a855f7" />
+      <rect x="88" y="0" width="36" height="36" rx="4" fill="#c084fc" />
+      <rect x="132" y="0" width="36" height="36" rx="4" fill="#4c1d95" />
+
+      <rect x="0" y="44" width="36" height="36" rx="4" fill="#a855f7" />
+      <rect x="44" y="44" width="36" height="36" rx="4" fill="#6b21a8" />
+      <rect x="88" y="44" width="36" height="36" rx="4" fill="#4c1d95" />
+      <rect x="132" y="44" width="36" height="36" rx="4" fill="#c084fc" />
+    </g>
+
+    <text x="18" y="148" fill="#e9d5ff" font-size="10" font-family="monospace">On-Device Edge Inference</text>
+  </g>
+
+  <!-- Right: Knowledge Graph Reasoning -->
+  <g transform="translate(285, 95)">
+    <rect width="270" height="170" rx="10" fill="#181026" stroke="#00f5ff" stroke-width="1" />
+    <text x="18" y="28" fill="#00f5ff" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">GRAPH REASONING</text>
+
+    <!-- Graph Nodes -->
+    <circle cx="60" cy="80" r="18" fill="#00f5ff" opacity="0.2" stroke="#00f5ff" stroke-width="1.5" />
+    <text x="48" y="84" fill="#ffffff" font-size="10" font-family="sans-serif">Node A</text>
+
+    <circle cx="210" cy="70" r="18" fill="#a855f7" opacity="0.2" stroke="#a855f7" stroke-width="1.5" />
+    <text x="198" y="74" fill="#ffffff" font-size="10" font-family="sans-serif">Node B</text>
+
+    <circle cx="135" cy="135" r="18" fill="#22c55e" opacity="0.2" stroke="#22c55e" stroke-width="1.5" />
+    <text x="123" y="139" fill="#ffffff" font-size="10" font-family="sans-serif">Node C</text>
+
+    <!-- Edge Lines -->
+    <line x1="78" y1="80" x2="192" y2="72" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
+    <line x1="60" y1="98" x2="120" y2="125" stroke="#00f5ff" stroke-width="1.5" opacity="0.6" />
+    <line x1="200" y1="85" x2="150" y2="125" stroke="#a855f7" stroke-width="1.5" opacity="0.6" />
+  </g>
+
+  <!-- Bottom Badges -->
+  <g transform="translate(30, 290)">
+    <rect width="540" height="52" rx="8" fill="rgba(25, 15, 40, 0.85)" stroke="rgba(255,255,255,0.06)" />
+    <text x="25" y="22" fill="#a88ec8" font-size="10">FOCUS TECH</text>
+    <text x="25" y="39" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">TinyML • Edge Quantization • Knowledge Graph Embeddings</text>
+  </g>
+</svg>

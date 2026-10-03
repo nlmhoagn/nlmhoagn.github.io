@@ -1,0 +1,76 @@
+<svg width="600" height="380" viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1118" />
+      <stop offset="50%" stop-color="#161b2b" />
+      <stop offset="100%" stop-color="#0c0e16" />
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="380" rx="16" fill="url(#bgGrad3)" stroke="#27334d" stroke-width="1.5" />
+
+  <!-- Top Bar -->
+  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(15, 20, 32, 0.9)" stroke="rgba(255,255,255,0.1)" />
+  <circle cx="48" cy="45" r="5" fill="#38bdf8" />
+  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">UIT Data Science Challenge 2026</text>
+  <rect x="390" y="32" width="170" height="25" rx="6" fill="rgba(56, 189, 248, 0.15)" stroke="#38bdf8" stroke-width="1" />
+  <text x="402" y="49" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">LEGAL RETRIEVAL</text>
+
+  <!-- Flowchart Architecture -->
+  <g transform="translate(30, 95)">
+    <!-- Stage 1: Structure-Aware Chunking -->
+    <rect x="0" y="20" width="115" height="110" rx="8" fill="#151e33" stroke="rgba(255,255,255,0.1)" />
+    <text x="14" y="45" fill="#93c5fd" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">Step 1</text>
+    <text x="14" y="68" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Structure</text>
+    <text x="14" y="85" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Chunking</text>
+    <text x="14" y="112" fill="#64748b" font-size="9" font-family="monospace">Legal Articles</text>
+
+    <!-- Arrow 1 -->
+    <path d="M 120 75 L 140 75" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Stage 2: Dual Retrieval -->
+    <g transform="translate(145, 0)">
+      <!-- BM25 Branch -->
+      <rect x="0" y="0" width="125" height="65" rx="8" fill="#1a2540" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="25" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">BM25 (Sparse)</text>
+      <text x="12" y="48" fill="#cbd5e1" font-size="10" font-family="sans-serif">Exact Keyword Top-K</text>
+
+      <!-- Dense Embeddings Branch -->
+      <rect x="0" y="80" width="125" height="65" rx="8" fill="#1a2540" stroke="#38bdf8" stroke-width="1" />
+      <text x="12" y="105" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">Dense Vectors</text>
+      <text x="12" y="128" fill="#cbd5e1" font-size="10" font-family="sans-serif">Semantic Similarity</text>
+    </g>
+
+    <!-- Arrow 2 Merge -->
+    <path d="M 275 32 L 305 75" stroke="#fbbf24" stroke-width="1.5" />
+    <path d="M 275 112 L 305 75" stroke="#38bdf8" stroke-width="1.5" />
+
+    <!-- Stage 3: Cross-Encoder Reranking -->
+    <g transform="translate(315, 20)">
+      <rect x="0" y="0" width="115" height="110" rx="8" fill="#1f1838" stroke="#a855f7" stroke-width="1.5" />
+      <text x="14" y="30" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold">Step 3</text>
+      <text x="14" y="55" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Cross-</text>
+      <text x="14" y="72" fill="#fff" font-family="'Inter', sans-serif" font-size="12" font-weight="600">Encoder</text>
+      <text x="14" y="98" fill="#e879f9" font-size="10" font-family="monospace">Reranker</text>
+    </g>
+
+    <!-- Arrow 3 -->
+    <path d="M 435 75 L 455 75" stroke="#a855f7" stroke-width="2" />
+
+    <!-- Final Output -->
+    <g transform="translate(460, 20)">
+      <rect x="0" y="0" width="80" height="110" rx="8" fill="#132320" stroke="#10b981" stroke-width="1.5" />
+      <text x="12" y="35" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">OUTPUT</text>
+      <text x="12" y="60" fill="#fff" font-family="'Inter', sans-serif" font-size="11" font-weight="600">Ranked</text>
+      <text x="12" y="78" fill="#fff" font-family="'Inter', sans-serif" font-size="11" font-weight="600">Passages</text>
+      <circle cx="40" cy="95" r="4" fill="#10b981" />
+    </g>
+  </g>
+
+  <!-- Metrics Bar Bottom -->
+  <g transform="translate(30, 295)">
+    <rect width="540" height="50" rx="8" fill="rgba(20, 25, 40, 0.85)" stroke="rgba(255,255,255,0.06)" />
+    <text x="25" y="30" fill="#94a3b8" font-size="11">Architecture: <tspan fill="#38bdf8" font-weight="bold">Hybrid Sparse + Dense</tspan></text>
+    <text x="310" y="30" fill="#94a3b8" font-size="11">Reranking: <tspan fill="#c084fc" font-weight="bold">Cross-Encoder Deep Transformer</tspan></text>
+  </g>
+</svg>

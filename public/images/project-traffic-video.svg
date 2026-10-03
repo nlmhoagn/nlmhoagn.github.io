@@ -1,0 +1,86 @@
+<svg width="600" height="380" viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d" />
+      <stop offset="50%" stop-color="#111c38" />
+      <stop offset="100%" stop-color="#080c18" />
+    </linearGradient>
+    <linearGradient id="blueGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#7000ff" />
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="380" rx="16" fill="url(#bgGrad2)" stroke="#223668" stroke-width="1.5" />
+
+  <!-- Top Bar -->
+  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(10, 16, 32, 0.9)" stroke="rgba(255,255,255,0.1)" />
+  <circle cx="48" cy="45" r="5" fill="#00f0ff" />
+  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">HCMC AI Challenge 2026 • FINALIST</text>
+  <rect x="410" y="32" width="150" height="25" rx="6" fill="rgba(112, 0, 255, 0.2)" stroke="#7000ff" stroke-width="1" />
+  <text x="424" y="49" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">MULTIMODAL VQA</text>
+
+  <!-- Query Box Mockup -->
+  <g transform="translate(30, 85)">
+    <rect width="540" height="42" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(0, 240, 255, 0.3)" />
+    <text x="18" y="26" fill="#88a0d0" font-family="'JetBrains Mono', monospace" font-size="12">Search: "Find white delivery truck turning left at intersection near bridge"</text>
+    <rect x="450" y="8" width="75" height="26" rx="5" fill="#00f0ff" />
+    <text x="468" y="25" fill="#000" font-family="'Inter', sans-serif" font-size="11" font-weight="bold">Search</text>
+  </g>
+
+  <!-- Visual Stream & Milvus Graph -->
+  <g transform="translate(30, 145)">
+    <!-- Video Frame 1 -->
+    <rect x="0" y="0" width="120" height="75" rx="6" fill="#141c30" stroke="rgba(255,255,255,0.1)" />
+    <text x="10" y="20" fill="#6680b0" font-family="'JetBrains Mono', monospace" font-size="9">CAM-04 14:20:01</text>
+    <rect x="25" y="32" width="50" height="30" rx="3" fill="rgba(0, 240, 255, 0.15)" stroke="#00f0ff" stroke-width="1" />
+    <text x="28" y="48" fill="#00f0ff" font-size="8" font-family="monospace">truck: 92%</text>
+
+    <!-- Video Frame 2 (Matched Keyframe) -->
+    <rect x="135" y="0" width="130" height="85" rx="6" fill="#182442" stroke="#00f0ff" stroke-width="2" />
+    <text x="145" y="20" fill="#00f0ff" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="bold">KEYFRAME MATCH</text>
+    <rect x="160" y="30" width="65" height="42" rx="4" fill="rgba(0, 240, 255, 0.2)" stroke="#ff3366" stroke-width="1.5" />
+    <text x="165" y="47" fill="#ffffff" font-size="8" font-family="monospace">SCORE: 0.964</text>
+    <circle cx="250" cy="18" r="4" fill="#00f0ff" />
+
+    <!-- Video Frame 3 -->
+    <rect x="280" y="0" width="120" height="75" rx="6" fill="#141c30" stroke="rgba(255,255,255,0.1)" />
+    <text x="290" y="20" fill="#6680b0" font-family="'JetBrains Mono', monospace" font-size="9">CAM-04 14:20:15</text>
+    <circle cx="340" cy="45" r="14" fill="rgba(255,255,255,0.05)" />
+
+    <!-- Milvus Vector Cluster -->
+    <g transform="translate(420, 0)">
+      <rect width="120" height="120" rx="8" fill="rgba(112, 0, 255, 0.08)" stroke="rgba(112, 0, 255, 0.3)" />
+      <text x="15" y="22" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">MILVUS DB</text>
+      <!-- Vector dots -->
+      <circle cx="35" cy="50" r="3" fill="#60a5fa" />
+      <circle cx="65" cy="40" r="4" fill="#00f0ff" />
+      <circle cx="85" cy="65" r="3" fill="#a855f7" />
+      <circle cx="50" cy="80" r="5" fill="#38bdf8" />
+      <circle cx="95" cy="90" r="3" fill="#60a5fa" />
+      <circle cx="30" cy="95" r="3" fill="#a855f7" />
+      <line x1="65" y1="40" x2="50" y2="80" stroke="#00f0ff" stroke-width="1" opacity="0.6" />
+      <line x1="50" y1="80" x2="85" y2="65" stroke="#a855f7" stroke-width="1" opacity="0.6" />
+      <text x="22" y="112" fill="#93c5fd" font-size="8" font-family="monospace">Dense Vectors</text>
+    </g>
+  </g>
+
+  <!-- Pipeline Badges Bottom -->
+  <g transform="translate(30, 290)">
+    <rect x="0" y="0" width="125" height="48" rx="8" fill="rgba(20, 30, 55, 0.8)" stroke="rgba(255,255,255,0.08)" />
+    <text x="12" y="20" fill="#7d93b8" font-size="9" font-family="sans-serif">EMBEDDINGS</text>
+    <text x="12" y="38" fill="#00f0ff" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">SigLIP / CLIP</text>
+
+    <rect x="140" y="0" width="125" height="48" rx="8" fill="rgba(20, 30, 55, 0.8)" stroke="rgba(255,255,255,0.08)" />
+    <text x="12" y="20" fill="#7d93b8" font-size="9" font-family="sans-serif">SPEECH & TEXT</text>
+    <text x="12" y="38" fill="#a855f7" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">ASR + OCR</text>
+
+    <rect x="280" y="0" width="125" height="48" rx="8" fill="rgba(20, 30, 55, 0.8)" stroke="rgba(255,255,255,0.08)" />
+    <text x="12" y="20" fill="#7d93b8" font-size="9" font-family="sans-serif">REASONING</text>
+    <text x="12" y="38" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">LLM Expansion</text>
+
+    <rect x="420" y="0" width="120" height="48" rx="8" fill="rgba(20, 30, 55, 0.8)" stroke="rgba(255,255,255,0.08)" />
+    <text x="12" y="20" fill="#7d93b8" font-size="9" font-family="sans-serif">VECTOR SEARCH</text>
+    <text x="12" y="38" fill="#22c55e" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">Milvus Index</text>
+  </g>
+</svg>

@@ -1,0 +1,75 @@
+<svg width="600" height="380" viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1215" />
+      <stop offset="50%" stop-color="#12252a" />
+      <stop offset="100%" stop-color="#081013" />
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="380" rx="16" fill="url(#bgGrad5)" stroke="#1a424a" stroke-width="1.5" />
+
+  <!-- Top Bar -->
+  <rect x="25" y="24" width="550" height="42" rx="10" fill="rgba(10, 22, 26, 0.9)" stroke="rgba(255,255,255,0.1)" />
+  <circle cx="48" cy="45" r="5" fill="#14b8a6" />
+  <text x="62" y="49" fill="#ffffff" font-family="'Inter', sans-serif" font-size="13" font-weight="600">Current Research Focus</text>
+  <rect x="360" y="32" width="200" height="25" rx="6" fill="rgba(20, 184, 166, 0.15)" stroke="#14b8a6" stroke-width="1" />
+  <text x="372" y="49" fill="#2dd4bf" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600">FEDERATED LEARNING / UAV</text>
+
+  <!-- Network Topology Diagram -->
+  <g transform="translate(50, 90)">
+    <!-- Central Aggregator Server / Ground Station -->
+    <g transform="translate(210, 20)">
+      <circle cx="40" cy="40" r="36" fill="#13383e" stroke="#2dd4bf" stroke-width="2" />
+      <circle cx="40" cy="40" r="28" fill="#0d282c" />
+      <text x="22" y="38" fill="#5eead4" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="bold">FEDAVG</text>
+      <text x="20" y="49" fill="#fff" font-family="'JetBrains Mono', monospace" font-size="8">SERVER</text>
+    </g>
+
+    <!-- UAV Node 1 (Top Left) -->
+    <g transform="translate(30, 0)">
+      <rect width="80" height="50" rx="8" fill="#152e33" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="22" fill="#7dd3fc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">UAV #1</text>
+      <text x="14" y="38" fill="#cbd5e1" font-size="8" font-family="monospace">Local W_1</text>
+      <!-- Drone Icon Line -->
+      <circle cx="68" cy="18" r="4" fill="#38bdf8" />
+    </g>
+
+    <!-- UAV Node 2 (Bottom Left) -->
+    <g transform="translate(40, 110)">
+      <rect width="80" height="50" rx="8" fill="#152e33" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="22" fill="#7dd3fc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">UAV #2</text>
+      <text x="14" y="38" fill="#cbd5e1" font-size="8" font-family="monospace">Local W_2</text>
+      <circle cx="68" cy="18" r="4" fill="#38bdf8" />
+    </g>
+
+    <!-- UAV Node 3 (Top Right) -->
+    <g transform="translate(390, 0)">
+      <rect width="80" height="50" rx="8" fill="#152e33" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="22" fill="#7dd3fc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">UAV #3</text>
+      <text x="14" y="38" fill="#cbd5e1" font-size="8" font-family="monospace">Local W_3</text>
+      <circle cx="68" cy="18" r="4" fill="#38bdf8" />
+    </g>
+
+    <!-- UAV Node 4 (Bottom Right) -->
+    <g transform="translate(380, 110)">
+      <rect width="80" height="50" rx="8" fill="#152e33" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="22" fill="#7dd3fc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">UAV #4</text>
+      <text x="14" y="38" fill="#cbd5e1" font-size="8" font-family="monospace">Local W_4</text>
+      <circle cx="68" cy="18" r="4" fill="#38bdf8" />
+    </g>
+
+    <!-- Wireless Links -->
+    <line x1="110" y1="30" x2="215" y2="55" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.8" />
+    <line x1="120" y1="130" x2="215" y2="70" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.8" />
+    <line x1="390" y1="30" x2="285" y2="55" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.8" />
+    <line x1="380" y1="130" x2="285" y2="70" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.8" />
+  </g>
+
+  <!-- Bottom Badges -->
+  <g transform="translate(30, 290)">
+    <rect width="540" height="52" rx="8" fill="rgba(15, 30, 35, 0.85)" stroke="rgba(255,255,255,0.06)" />
+    <text x="25" y="22" fill="#94a3b8" font-size="10">RESEARCH TOPICS</text>
+    <text x="25" y="39" fill="#2dd4bf" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold">Privacy-Preserving Swarm Intelligence • Communication-Efficient Aggregation</text>
+  </g>
+</svg>
