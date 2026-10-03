@@ -1,18 +1,12 @@
 import * as THREE from "three";
 
-const BASE_URL = import.meta.env.BASE_URL.endsWith("/")
-  ? import.meta.env.BASE_URL
-  : import.meta.env.BASE_URL + "/";
-
 /**
  * Customizes the 3D character to authentically match Hoang Nguyen:
  * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
  * 2. Solid matte black crewneck T-shirt (ao thun den)
  * 3. Clean natural original haircut (bo luon mai di)
- * 4. Realistic human-proportioned ears (completely hides cartoon dumbo ears)
- * 5. Realistic Asian eyes:
- *    - Crisp, radiant white sclera (trong trang mat)
- *    - Natural deep espresso brown iris with black pupil
+ * 4. Original animated eyes from GLTF model (doi mat cu)
+ * 5. Realistic human-proportioned ears (completely hides cartoon dumbo ears)
  * 6. Fashionable oversized clear acetate glasses:
  *    - Oversized Pantos / Wellington shape (soft curved rounded bottom, never boxy/square)
  *    - Translucent clear crystal acetate frame with glossy reflections and silver rivets
@@ -31,18 +25,13 @@ export function customizeCharacter(character: THREE.Object3D) {
   const browColor = new THREE.Color("#1c1a22"); // Refined natural dark eyebrows
   const pantsColor = new THREE.Color("#18171f"); // Dark denim pants
 
-  // 2. Refine eyebrow bones (make them sleek and natural, not giant cartoon caterpillars)
+  // 2. Refine eyebrow bones (make them sleek and natural)
   const browL = character.getObjectByName("eyebrow_L");
   if (browL) browL.scale.set(0.70, 0.55, 0.70);
   const browR = character.getObjectByName("eyebrow_R");
   if (browR) browR.scale.set(0.70, 0.55, 0.70);
 
-  // Load custom Asian eye texture (bright white sclera, natural dark brown iris)
-  const textureLoader = new THREE.TextureLoader();
-  const eyeTexture = textureLoader.load(`${BASE_URL}models/eye_asian.png`);
-  eyeTexture.colorSpace = THREE.SRGBColorSpace;
-
-  // 3. Traverse all meshes and assign custom materials
+  // 3. Traverse all meshes and assign custom materials (eyes are left as original)
   character.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh;
@@ -83,16 +72,6 @@ export function customizeCharacter(character: THREE.Object3D) {
           roughness: 0.78,
           metalness: 0.0,
         });
-      } else if (name.includes("EYEs") || name.includes("Eyes")) {
-        // Natural Asian eyes with bright white sclera and dark espresso iris
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          map: eyeTexture,
-          roughness: 0.04,
-          metalness: 0.0,
-          emissive: 0x444444,
-          emissiveIntensity: 0.25, // Ensures white sclera stays crisp and radiant
-        });
       } else if (name.includes("Pant")) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: pantsColor,
@@ -100,6 +79,7 @@ export function customizeCharacter(character: THREE.Object3D) {
           metalness: 0.02,
         });
       }
+      // Eyes are kept with their original material and texture from the 3D model
     }
   });
 
