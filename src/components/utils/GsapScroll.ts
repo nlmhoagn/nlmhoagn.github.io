@@ -77,7 +77,12 @@ export function setCharTimeline(
         .fromTo(".character-model", { x: 0 }, { x: "-25%", duration: 1 }, 0)
         .to(".landing-container", { opacity: 0, duration: 0.4 }, 0)
         .to(".landing-container", { y: "40%", duration: 0.8 }, 0)
-        .fromTo(".about-me", { y: "-50%" }, { y: "0%" }, 0);
+        .fromTo(
+          ".about-me",
+          { opacity: 0, y: "40px" },
+          { opacity: 1, y: "0px", duration: 0.7 },
+          0.2
+        );
 
       tl2
         .to(

@@ -143,7 +143,6 @@ export default function setSplitText() {
   const titles: NodeListOf<ParaElement> = document.querySelectorAll(".title");
 
   const TriggerStart = window.innerWidth <= 1024 ? "top 60%" : "20% 60%";
-  const ToggleAction = "play pause resume reverse";
 
   paras.forEach((para: ParaElement) => {
     para.classList.add("visible");
@@ -157,24 +156,37 @@ export default function setSplitText() {
       linesClass: "split-line",
     });
 
+    if (para.closest(".about-me")) {
+      // About Me is smoothly and directly scrubbed by tl1 in GsapScroll.ts
+      para.style.opacity = "1";
+      para.style.visibility = "visible";
+      return;
+    }
+
     para.anim = gsap.fromTo(
       para.split.words,
-      { autoAlpha: 0, y: 80 },
+      { opacity: 0, y: 40 },
       {
-        autoAlpha: 1,
+        opacity: 1,
         scrollTrigger: {
           trigger: para.parentElement?.parentElement,
-          toggleActions: ToggleAction,
+          toggleActions: "play none none reverse",
           start: TriggerStart,
         },
-        duration: 1,
-        ease: "power3.out",
+        duration: 0.8,
+        ease: "power2.out",
         y: 0,
         stagger: 0.02,
       }
     );
   });
   titles.forEach((title: ParaElement) => {
+    if (title.closest(".about-me")) {
+      title.style.opacity = "1";
+      title.style.visibility = "visible";
+      return;
+    }
+
     if (title.anim) {
       title.anim.progress(1).kill();
       title.split?.revert();
@@ -185,22 +197,20 @@ export default function setSplitText() {
     });
     title.anim = gsap.fromTo(
       title.split.chars,
-      { autoAlpha: 0, y: 80, rotate: 10 },
+      { opacity: 0, y: 40, rotate: 5 },
       {
-        autoAlpha: 1,
+        opacity: 1,
         scrollTrigger: {
           trigger: title.parentElement?.parentElement,
-          toggleActions: ToggleAction,
+          toggleActions: "play none none reverse",
           start: TriggerStart,
         },
         duration: 0.8,
-        ease: "power2.inOut",
+        ease: "power2.out",
         y: 0,
         rotate: 0,
-        stagger: 0.03,
+        stagger: 0.02,
       }
     );
   });
-
-  ScrollTrigger.addEventListener("refresh", () => setSplitText());
 }
