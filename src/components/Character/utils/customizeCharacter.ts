@@ -11,7 +11,9 @@ import * as THREE from "three";
  * 7. Polished sterling silver hoop earrings:
  *    - Left ear: 1st lobe, 2nd lobe, and snug outer-rim conch hoop
  *    - Right ear: 1st lobe
- * 8. Lush, dense, layered golden blonde mullet nape hair (gay mullet vang day dan, soi min tu nhien)
+ * 8. Seamless, dense golden blonde mullet nape hair:
+ *    - Connects directly to the upper black hair mass (no skin gap)
+ *    - Cascades down in lush, layered, fine-stranded waves
  */
 export function customizeCharacter(character: THREE.Object3D) {
   // 1. Color palette tailored to user's photo
@@ -97,15 +99,13 @@ export function customizeCharacter(character: THREE.Object3D) {
   const earrings = createEarrings();
   headBone.add(earrings);
 
-  // Add dense, layered golden blonde mullet nape hair (gay vang day dan)
+  // Add seamless, dense golden blonde mullet nape hair connecting to upper hair
   const blondeNape = createBlondeMulletNape();
   headBone.add(blondeNape);
 }
 
 /**
  * Creates realistic human-proportioned ears positioned naturally on the sides of the head.
- * In spine006 coordinates: Head sides sit at x = +-0.98.
- * Outer helix ridge runs vertically at x = +-1.15, z = 0.23, y = 0.86 to 1.25.
  */
 function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color): THREE.Group {
   const group = new THREE.Group();
@@ -316,7 +316,7 @@ function createOversizedGlasses(): THREE.Group {
   rightArm.rotation.y = 0.10;
   group.add(rightArm);
 
-  // Silver metal pin rivets on outer temple corners (as seen in photo)
+  // Silver metal pin rivets on outer temple corners
   const pinGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.028, 8);
   const leftPin = new THREE.Mesh(pinGeo, silverRivetsMat);
   leftPin.rotation.x = Math.PI / 2;
@@ -336,7 +336,7 @@ function createOversizedGlasses(): THREE.Group {
  * - Tai trái:
  *   1. 1st lobe: dưới cùng dái tai
  *   2. 2nd lobe: trên 1st lobe dọc vành dái tai
- *   3. Conch: nhỏ gọn, đẩy sát ra ngoài bo tròn ôm khít phần viền tai nhô lên (theo đúng ảnh mẫu media_1791023980600.png)
+ *   3. Conch: nhỏ gọn (radius 0.046), ôm khít bo tròn phần viền sụn nổi lên của tai
  * - Tai phải:
  *   1. 1st lobe: dưới cùng dái tai
  */
@@ -349,7 +349,7 @@ function createEarrings(): THREE.Group {
     metalness: 0.98,
     roughness: 0.04,
     emissive: 0x666666,
-    emissiveIntensity: 0.40, // Brilliant metallic specular shine
+    emissiveIntensity: 0.40,
   });
 
   function makeHoop(radius: number, tube: number) {
@@ -370,8 +370,7 @@ function createEarrings(): THREE.Group {
   left2ndLobe.rotation.set(0.10, 1.45, 0.15);
   group.add(left2ndLobe);
 
-  // 3. Left Conch: Nhỏ hơn (radius 0.046, tube 0.009), đẩy sát ra ngoài (x = 1.138, z = 0.232)
-  // ôm tròn khít phần viền tai nhô lên chuẩn theo ảnh media_1791023980600.png
+  // 3. Left Conch: Nhỏ hơn, ôm khít bo tròn phần viền tai nhô lên chuẩn theo ảnh
   const leftConch = makeHoop(0.046, 0.009);
   leftConch.position.set(1.138, 0.99, 0.232);
   leftConch.rotation.set(Math.PI / 2 - 0.16, 0.15, -0.22);
@@ -388,10 +387,10 @@ function createEarrings(): THREE.Group {
 }
 
 /**
- * Creates lush, layered, fine-stranded golden blonde mullet nape hair:
- * - Natural, dense texture with multiple fine strands (not giant chunky tubes)
- * - Layered feathered flow cascading down the back of the neck and shoulders (theo anh media_1791023945330.png)
- * - Peeks out gracefully around the jaw/neck with subtle flicked tips
+ * Creates lush, dense, seamless golden blonde mullet nape hair:
+ * - CONNECTS DIRECTLY TO THE UPPER BLACK HAIR MASS (tucked under the black hair rim from y = 1.28)
+ * - Completely covers the skull and neck behind the ears, eliminating the split/gap
+ * - Cascading fine-stranded wavy layers flowing over the collar
  */
 function createBlondeMulletNape(): THREE.Group {
   const group = new THREE.Group();
@@ -402,24 +401,28 @@ function createBlondeMulletNape(): THREE.Group {
     color: "#edbe3b", // Primary warm golden blonde
     roughness: 0.54,
     metalness: 0.08,
+    side: THREE.DoubleSide,
   });
 
   const sunlitBlonde = new THREE.MeshStandardMaterial({
     color: "#fad86b", // Bright sunlit blonde highlight
     roughness: 0.50,
     metalness: 0.10,
+    side: THREE.DoubleSide,
   });
 
   const lightWheatBlonde = new THREE.MeshStandardMaterial({
     color: "#fae79d", // Light champagne feathered tip highlight
     roughness: 0.48,
     metalness: 0.08,
+    side: THREE.DoubleSide,
   });
 
   const richHoneyBlonde = new THREE.MeshStandardMaterial({
     color: "#cf9223", // Rich amber/honey undertone for volume depth
     roughness: 0.60,
     metalness: 0.06,
+    side: THREE.DoubleSide,
   });
 
   function makeLock(
@@ -428,214 +431,254 @@ function createBlondeMulletNape(): THREE.Group {
     material: THREE.Material
   ) {
     const curve = new THREE.CatmullRomCurve3(points);
-    const geom = new THREE.TubeGeometry(curve, 18, radius, 8, false);
+    const geom = new THREE.TubeGeometry(curve, 22, radius, 8, false);
     return new THREE.Mesh(geom, material);
   }
 
-  // --- 1. LEFT SIDE FLOWERING MULLET WAVES (Fine, layered, dense) ---
-  // Outer layer: soft feathered tips peeking out around jaw/ears
-  group.add(makeLock([
-    new THREE.Vector3(0.58, 0.85, -0.12),
-    new THREE.Vector3(0.68, 0.56, -0.19),
-    new THREE.Vector3(0.74, 0.26, -0.25),
-    new THREE.Vector3(0.72, -0.04, -0.29),
-    new THREE.Vector3(0.66, -0.26, -0.30),
-  ], 0.028, sunlitBlonde));
+  // --- 0. SEAMLESS CONNECTING ROOT COLLAR (Underlayer bridging black hair directly to mullet) ---
+  // Wraps from behind left ear across back of skull to behind right ear,
+  // starting high at y = 1.28 (tucked under black hair) down to y = 0.65
+  function buildConnectingCollar(): THREE.Mesh {
+    const uSegments = 24;
+    const vSegments = 8;
+    const geom = new THREE.BufferGeometry();
+    const positions: number[] = [];
+    const indices: number[] = [];
 
-  group.add(makeLock([
-    new THREE.Vector3(0.52, 0.88, -0.16),
-    new THREE.Vector3(0.64, 0.58, -0.23),
-    new THREE.Vector3(0.72, 0.28, -0.28),
-    new THREE.Vector3(0.73, 0.00, -0.31),
-    new THREE.Vector3(0.69, -0.24, -0.31),
-  ], 0.030, lightWheatBlonde));
+    for (let iv = 0; iv <= vSegments; iv++) {
+      const v = iv / vSegments;
+      const y = 1.28 - v * 0.60; // 1.28 (under black hair) down to 0.68
+      const rx = 0.95 - v * 0.16; // hugs skull width down to neck
+      const rz = 0.52 - v * 0.10;
 
-  group.add(makeLock([
-    new THREE.Vector3(0.55, 0.78, -0.14),
-    new THREE.Vector3(0.66, 0.48, -0.22),
-    new THREE.Vector3(0.73, 0.18, -0.26),
-    new THREE.Vector3(0.70, -0.10, -0.30),
-    new THREE.Vector3(0.63, -0.30, -0.28),
-  ], 0.026, goldenBlonde));
+      for (let iu = 0; iu <= uSegments; iu++) {
+        const u = iu / uSegments;
+        // Spans from behind left ear (theta ~ -0.15 rad) around back to behind right ear (theta ~ 3.29 rad)
+        const theta = -0.15 + u * (Math.PI + 0.30);
+        const x = Math.cos(theta) * rx;
+        const z = -Math.sin(theta) * rz;
 
+        positions.push(x, y, z);
+      }
+    }
+
+    const stride = uSegments + 1;
+    for (let iv = 0; iv < vSegments; iv++) {
+      for (let iu = 0; iu < uSegments; iu++) {
+        const a = iv * stride + iu;
+        const b = (iv + 1) * stride + iu;
+        const c = a + 1;
+        const d = b + 1;
+
+        indices.push(a, b, c);
+        indices.push(c, b, d);
+      }
+    }
+
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+
+    return new THREE.Mesh(geom, goldenBlonde);
+  }
+
+  group.add(buildConnectingCollar());
+
+  // --- 1. LEFT SIDE CONNECTING & FLOWING MULLET WAVES (All start high at y = 1.22 - 1.28) ---
+  // Lock 1: Emerges directly from under the black hair right behind the left ear crest
   group.add(makeLock([
-    new THREE.Vector3(0.48, 0.82, -0.20),
-    new THREE.Vector3(0.60, 0.52, -0.26),
-    new THREE.Vector3(0.67, 0.22, -0.30),
-    new THREE.Vector3(0.66, -0.08, -0.32),
-    new THREE.Vector3(0.59, -0.28, -0.30),
+    new THREE.Vector3(0.93, 1.28, 0.12),
+    new THREE.Vector3(0.96, 1.04, 0.08),
+    new THREE.Vector3(0.92, 0.76, 0.00),
+    new THREE.Vector3(0.82, 0.44, -0.08),
+    new THREE.Vector3(0.72, 0.10, -0.16),
+    new THREE.Vector3(0.66, -0.22, -0.20),
   ], 0.030, sunlitBlonde));
 
-  // Mid-layer: lush wavy body giving dense volume
+  // Lock 2: Behind upper ear / mastoid, flowing down along jawline
   group.add(makeLock([
-    new THREE.Vector3(0.42, 0.86, -0.28),
-    new THREE.Vector3(0.52, 0.56, -0.34),
-    new THREE.Vector3(0.60, 0.24, -0.38),
-    new THREE.Vector3(0.59, -0.10, -0.38),
-    new THREE.Vector3(0.53, -0.30, -0.36),
-  ], 0.032, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.49, 0.80, -0.26),
-    new THREE.Vector3(0.59, 0.50, -0.32),
-    new THREE.Vector3(0.65, 0.18, -0.36),
-    new THREE.Vector3(0.63, -0.14, -0.36),
-    new THREE.Vector3(0.56, -0.32, -0.34),
-  ], 0.030, richHoneyBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.36, 0.88, -0.36),
-    new THREE.Vector3(0.46, 0.58, -0.42),
-    new THREE.Vector3(0.52, 0.26, -0.46),
-    new THREE.Vector3(0.50, -0.10, -0.44),
-    new THREE.Vector3(0.44, -0.32, -0.40),
-  ], 0.034, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.43, 0.76, -0.33),
-    new THREE.Vector3(0.53, 0.46, -0.38),
-    new THREE.Vector3(0.57, 0.14, -0.42),
-    new THREE.Vector3(0.53, -0.16, -0.42),
-    new THREE.Vector3(0.47, -0.34, -0.38),
+    new THREE.Vector3(0.88, 1.26, 0.04),
+    new THREE.Vector3(0.91, 1.00, -0.01),
+    new THREE.Vector3(0.87, 0.72, -0.08),
+    new THREE.Vector3(0.78, 0.40, -0.16),
+    new THREE.Vector3(0.69, 0.06, -0.22),
+    new THREE.Vector3(0.63, -0.25, -0.24),
   ], 0.030, lightWheatBlonde));
 
-  // Inner layer: deep neck coverage
+  // Lock 3: Posterolateral neck, connecting from under black hair
   group.add(makeLock([
-    new THREE.Vector3(0.30, 0.85, -0.40),
-    new THREE.Vector3(0.38, 0.54, -0.46),
-    new THREE.Vector3(0.43, 0.22, -0.50),
-    new THREE.Vector3(0.41, -0.12, -0.48),
-    new THREE.Vector3(0.35, -0.32, -0.44),
+    new THREE.Vector3(0.80, 1.24, -0.08),
+    new THREE.Vector3(0.83, 0.96, -0.12),
+    new THREE.Vector3(0.80, 0.66, -0.18),
+    new THREE.Vector3(0.73, 0.35, -0.24),
+    new THREE.Vector3(0.65, 0.02, -0.28),
+    new THREE.Vector3(0.59, -0.28, -0.28),
+  ], 0.032, goldenBlonde));
+
+  // Lock 4: Mid-outer neck wave
+  group.add(makeLock([
+    new THREE.Vector3(0.70, 1.22, -0.18),
+    new THREE.Vector3(0.74, 0.92, -0.22),
+    new THREE.Vector3(0.72, 0.62, -0.26),
+    new THREE.Vector3(0.67, 0.30, -0.30),
+    new THREE.Vector3(0.60, -0.02, -0.32),
+    new THREE.Vector3(0.55, -0.30, -0.32),
+  ], 0.032, sunlitBlonde));
+
+  // Lock 5: Dense body strand 1
+  group.add(makeLock([
+    new THREE.Vector3(0.62, 1.20, -0.26),
+    new THREE.Vector3(0.66, 0.90, -0.30),
+    new THREE.Vector3(0.65, 0.58, -0.34),
+    new THREE.Vector3(0.61, 0.25, -0.36),
+    new THREE.Vector3(0.55, -0.06, -0.36),
+    new THREE.Vector3(0.50, -0.32, -0.34),
   ], 0.034, richHoneyBlonde));
 
+  // Lock 6: Feathered outer wisp flaring forward
   group.add(makeLock([
-    new THREE.Vector3(0.24, 0.82, -0.44),
-    new THREE.Vector3(0.31, 0.50, -0.50),
-    new THREE.Vector3(0.35, 0.18, -0.53),
-    new THREE.Vector3(0.33, -0.14, -0.50),
-    new THREE.Vector3(0.27, -0.33, -0.46),
-  ], 0.032, goldenBlonde));
+    new THREE.Vector3(0.84, 1.15, 0.02),
+    new THREE.Vector3(0.88, 0.86, -0.04),
+    new THREE.Vector3(0.83, 0.55, -0.12),
+    new THREE.Vector3(0.76, 0.22, -0.20),
+    new THREE.Vector3(0.70, -0.10, -0.24),
+  ], 0.028, lightWheatBlonde));
 
-  // --- 2. RIGHT SIDE FLOWERING MULLET WAVES (Mirrored, fine, dense) ---
+  // Lock 7: Inner dense volume lock
   group.add(makeLock([
-    new THREE.Vector3(-0.58, 0.85, -0.12),
-    new THREE.Vector3(-0.68, 0.56, -0.19),
-    new THREE.Vector3(-0.74, 0.26, -0.25),
-    new THREE.Vector3(-0.72, -0.04, -0.29),
-    new THREE.Vector3(-0.66, -0.26, -0.30),
-  ], 0.028, sunlitBlonde));
+    new THREE.Vector3(0.52, 1.18, -0.34),
+    new THREE.Vector3(0.56, 0.86, -0.38),
+    new THREE.Vector3(0.55, 0.52, -0.42),
+    new THREE.Vector3(0.51, 0.20, -0.42),
+    new THREE.Vector3(0.45, -0.10, -0.40),
+  ], 0.034, goldenBlonde));
 
+  // Lock 8: Deep neck coverage lock
   group.add(makeLock([
-    new THREE.Vector3(-0.52, 0.88, -0.16),
-    new THREE.Vector3(-0.64, 0.58, -0.23),
-    new THREE.Vector3(-0.72, 0.28, -0.28),
-    new THREE.Vector3(-0.73, 0.00, -0.31),
-    new THREE.Vector3(-0.69, -0.24, -0.31),
-  ], 0.030, lightWheatBlonde));
+    new THREE.Vector3(0.40, 1.16, -0.40),
+    new THREE.Vector3(0.44, 0.82, -0.44),
+    new THREE.Vector3(0.45, 0.48, -0.46),
+    new THREE.Vector3(0.41, 0.16, -0.46),
+    new THREE.Vector3(0.36, -0.14, -0.42),
+  ], 0.032, richHoneyBlonde));
 
+  // --- 2. RIGHT SIDE CONNECTING & FLOWING MULLET WAVES (Mirrored for x < 0) ---
+  // Lock 1: Directly behind right ear crest
   group.add(makeLock([
-    new THREE.Vector3(-0.55, 0.78, -0.14),
-    new THREE.Vector3(-0.66, 0.48, -0.22),
-    new THREE.Vector3(-0.73, 0.18, -0.26),
-    new THREE.Vector3(-0.70, -0.10, -0.30),
-    new THREE.Vector3(-0.63, -0.30, -0.28),
-  ], 0.026, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.48, 0.82, -0.20),
-    new THREE.Vector3(-0.60, 0.52, -0.26),
-    new THREE.Vector3(-0.67, 0.22, -0.30),
-    new THREE.Vector3(-0.66, -0.08, -0.32),
-    new THREE.Vector3(-0.59, -0.28, -0.30),
+    new THREE.Vector3(-0.93, 1.28, 0.12),
+    new THREE.Vector3(-0.96, 1.04, 0.08),
+    new THREE.Vector3(-0.92, 0.76, 0.00),
+    new THREE.Vector3(-0.82, 0.44, -0.08),
+    new THREE.Vector3(-0.72, 0.10, -0.16),
+    new THREE.Vector3(-0.66, -0.22, -0.20),
   ], 0.030, sunlitBlonde));
 
+  // Lock 2: Behind upper right ear / mastoid
   group.add(makeLock([
-    new THREE.Vector3(-0.42, 0.86, -0.28),
-    new THREE.Vector3(-0.52, 0.56, -0.34),
-    new THREE.Vector3(-0.60, 0.24, -0.38),
-    new THREE.Vector3(-0.59, -0.10, -0.38),
-    new THREE.Vector3(-0.53, -0.30, -0.36),
-  ], 0.032, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.49, 0.80, -0.26),
-    new THREE.Vector3(-0.59, 0.50, -0.32),
-    new THREE.Vector3(-0.65, 0.18, -0.36),
-    new THREE.Vector3(-0.63, -0.14, -0.36),
-    new THREE.Vector3(-0.56, -0.32, -0.34),
-  ], 0.030, richHoneyBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.36, 0.88, -0.36),
-    new THREE.Vector3(-0.46, 0.58, -0.42),
-    new THREE.Vector3(-0.52, 0.26, -0.46),
-    new THREE.Vector3(-0.50, -0.10, -0.44),
-    new THREE.Vector3(-0.44, -0.32, -0.40),
-  ], 0.034, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.43, 0.76, -0.33),
-    new THREE.Vector3(-0.53, 0.46, -0.38),
-    new THREE.Vector3(-0.57, 0.14, -0.42),
-    new THREE.Vector3(-0.53, -0.16, -0.42),
-    new THREE.Vector3(-0.47, -0.34, -0.38),
+    new THREE.Vector3(-0.88, 1.26, 0.04),
+    new THREE.Vector3(-0.91, 1.00, -0.01),
+    new THREE.Vector3(-0.87, 0.72, -0.08),
+    new THREE.Vector3(-0.78, 0.40, -0.16),
+    new THREE.Vector3(-0.69, 0.06, -0.22),
+    new THREE.Vector3(-0.63, -0.25, -0.24),
   ], 0.030, lightWheatBlonde));
 
+  // Lock 3: Posterolateral right neck
   group.add(makeLock([
-    new THREE.Vector3(-0.30, 0.85, -0.40),
-    new THREE.Vector3(-0.38, 0.54, -0.46),
-    new THREE.Vector3(-0.43, 0.22, -0.50),
-    new THREE.Vector3(-0.41, -0.12, -0.48),
-    new THREE.Vector3(-0.35, -0.32, -0.44),
+    new THREE.Vector3(-0.80, 1.24, -0.08),
+    new THREE.Vector3(-0.83, 0.96, -0.12),
+    new THREE.Vector3(-0.80, 0.66, -0.18),
+    new THREE.Vector3(-0.73, 0.35, -0.24),
+    new THREE.Vector3(-0.65, 0.02, -0.28),
+    new THREE.Vector3(-0.59, -0.28, -0.28),
+  ], 0.032, goldenBlonde));
+
+  // Lock 4: Mid-outer right neck wave
+  group.add(makeLock([
+    new THREE.Vector3(-0.70, 1.22, -0.18),
+    new THREE.Vector3(-0.74, 0.92, -0.22),
+    new THREE.Vector3(-0.72, 0.62, -0.26),
+    new THREE.Vector3(-0.67, 0.30, -0.30),
+    new THREE.Vector3(-0.60, -0.02, -0.32),
+    new THREE.Vector3(-0.55, -0.30, -0.32),
+  ], 0.032, sunlitBlonde));
+
+  // Lock 5: Dense body strand
+  group.add(makeLock([
+    new THREE.Vector3(-0.62, 1.20, -0.26),
+    new THREE.Vector3(-0.66, 0.90, -0.30),
+    new THREE.Vector3(-0.65, 0.58, -0.34),
+    new THREE.Vector3(-0.61, 0.25, -0.36),
+    new THREE.Vector3(-0.55, -0.06, -0.36),
+    new THREE.Vector3(-0.50, -0.32, -0.34),
   ], 0.034, richHoneyBlonde));
 
+  // Lock 6: Feathered outer wisp
   group.add(makeLock([
-    new THREE.Vector3(-0.24, 0.82, -0.44),
-    new THREE.Vector3(-0.31, 0.50, -0.50),
-    new THREE.Vector3(-0.35, 0.18, -0.53),
-    new THREE.Vector3(-0.33, -0.14, -0.50),
-    new THREE.Vector3(-0.27, -0.33, -0.46),
-  ], 0.032, goldenBlonde));
+    new THREE.Vector3(-0.84, 1.15, 0.02),
+    new THREE.Vector3(-0.88, 0.86, -0.04),
+    new THREE.Vector3(-0.83, 0.55, -0.12),
+    new THREE.Vector3(-0.76, 0.22, -0.20),
+    new THREE.Vector3(-0.70, -0.10, -0.24),
+  ], 0.028, lightWheatBlonde));
+
+  // Lock 7: Inner dense volume lock
+  group.add(makeLock([
+    new THREE.Vector3(-0.52, 1.18, -0.34),
+    new THREE.Vector3(-0.56, 0.86, -0.38),
+    new THREE.Vector3(-0.55, 0.52, -0.42),
+    new THREE.Vector3(-0.51, 0.20, -0.42),
+    new THREE.Vector3(-0.45, -0.10, -0.40),
+  ], 0.034, goldenBlonde));
+
+  // Lock 8: Deep neck coverage lock
+  group.add(makeLock([
+    new THREE.Vector3(-0.40, 1.16, -0.40),
+    new THREE.Vector3(-0.44, 0.82, -0.44),
+    new THREE.Vector3(-0.45, 0.48, -0.46),
+    new THREE.Vector3(-0.41, 0.16, -0.46),
+    new THREE.Vector3(-0.36, -0.14, -0.42),
+  ], 0.032, richHoneyBlonde));
 
   // --- 3. CENTER WATERFALL CASCADING DOWN NAPE & COLLAR ---
   group.add(makeLock([
-    new THREE.Vector3(0.00, 0.92, -0.48),
-    new THREE.Vector3(0.00, 0.60, -0.56),
-    new THREE.Vector3(0.00, 0.25, -0.62),
-    new THREE.Vector3(0.00, -0.14, -0.60),
-    new THREE.Vector3(0.00, -0.36, -0.54),
+    new THREE.Vector3(0.00, 1.20, -0.46),
+    new THREE.Vector3(0.00, 0.85, -0.52),
+    new THREE.Vector3(0.00, 0.45, -0.58),
+    new THREE.Vector3(0.00, 0.05, -0.58),
+    new THREE.Vector3(0.00, -0.32, -0.52),
   ], 0.036, sunlitBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.07, 0.90, -0.47),
-    new THREE.Vector3(0.09, 0.58, -0.55),
-    new THREE.Vector3(0.10, 0.22, -0.61),
-    new THREE.Vector3(0.09, -0.15, -0.59),
-    new THREE.Vector3(0.06, -0.37, -0.53),
+    new THREE.Vector3(0.12, 1.18, -0.44),
+    new THREE.Vector3(0.14, 0.82, -0.50),
+    new THREE.Vector3(0.15, 0.42, -0.55),
+    new THREE.Vector3(0.12, 0.02, -0.54),
+    new THREE.Vector3(0.08, -0.34, -0.48),
   ], 0.034, goldenBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.07, 0.90, -0.47),
-    new THREE.Vector3(-0.09, 0.58, -0.55),
-    new THREE.Vector3(-0.10, 0.22, -0.61),
-    new THREE.Vector3(-0.09, -0.15, -0.59),
-    new THREE.Vector3(-0.06, -0.37, -0.53),
+    new THREE.Vector3(-0.12, 1.18, -0.44),
+    new THREE.Vector3(-0.14, 0.82, -0.50),
+    new THREE.Vector3(-0.15, 0.42, -0.55),
+    new THREE.Vector3(-0.12, 0.02, -0.54),
+    new THREE.Vector3(-0.08, -0.34, -0.48),
   ], 0.034, goldenBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(0.14, 0.87, -0.46),
-    new THREE.Vector3(0.18, 0.54, -0.53),
-    new THREE.Vector3(0.20, 0.18, -0.58),
-    new THREE.Vector3(0.18, -0.16, -0.56),
-    new THREE.Vector3(0.13, -0.36, -0.50),
+    new THREE.Vector3(0.24, 1.16, -0.42),
+    new THREE.Vector3(0.28, 0.78, -0.47),
+    new THREE.Vector3(0.28, 0.38, -0.51),
+    new THREE.Vector3(0.24, -0.02, -0.50),
+    new THREE.Vector3(0.18, -0.35, -0.44),
   ], 0.032, richHoneyBlonde));
 
   group.add(makeLock([
-    new THREE.Vector3(-0.14, 0.87, -0.46),
-    new THREE.Vector3(-0.18, 0.54, -0.53),
-    new THREE.Vector3(-0.20, 0.18, -0.58),
-    new THREE.Vector3(-0.18, -0.16, -0.56),
-    new THREE.Vector3(-0.13, -0.36, -0.50),
+    new THREE.Vector3(-0.24, 1.16, -0.42),
+    new THREE.Vector3(-0.28, 0.78, -0.47),
+    new THREE.Vector3(-0.28, 0.38, -0.51),
+    new THREE.Vector3(-0.24, -0.02, -0.50),
+    new THREE.Vector3(-0.18, -0.35, -0.44),
   ], 0.032, richHoneyBlonde));
 
   return group;
