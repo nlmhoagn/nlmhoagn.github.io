@@ -37,7 +37,7 @@ export class ScrollSmoother {
         this.lenis?.raf(time * 1000);
       };
       gsap.ticker.add(this.tickerFn);
-      gsap.ticker.lagSmoothing(500, 33);
+      gsap.ticker.lagSmoothing(0);
 
       if (typeof ResizeObserver !== "undefined") {
         this.resizeObserver = new ResizeObserver(() => {

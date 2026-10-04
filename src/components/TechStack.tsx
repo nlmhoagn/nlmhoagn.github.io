@@ -95,9 +95,9 @@ function SphereGeo({
     delta = Math.min(0.05, delta);
     const trans = api.current.translation();
     vec.current.set(
-      trans.x * -50 * delta * scale,
-      trans.y * -140 * delta * scale,
-      trans.z * -50 * delta * scale
+      trans.x * -35 * delta * scale,
+      trans.y * -45 * delta * scale,
+      trans.z * -35 * delta * scale
     );
 
     api.current.applyImpulse(vec.current, true);
@@ -105,10 +105,10 @@ function SphereGeo({
 
   return (
     <RigidBody
-      linearDamping={0.8}
-      angularDamping={0.2}
-      friction={0.25}
-      position={[r(18), r(18) - 20, r(18) - 8]}
+      linearDamping={1.5}
+      angularDamping={0.6}
+      friction={0.3}
+      position={[r(12), r(8), r(6)]}
       ref={api}
       colliders={false}
     >
@@ -132,17 +132,16 @@ type PointerProps = {
 function Pointer({ isActive }: PointerProps) {
   const ref = useRef<RapierRigidBody>(null);
   const vec = useRef(new THREE.Vector3());
+  const targetVec = useRef(new THREE.Vector3());
 
   useFrame(({ pointer, viewport }) => {
     if (!isActive || !ref.current) return;
-    vec.current.lerp(
-      new THREE.Vector3(
-        (pointer.x * viewport.width) / 2,
-        (pointer.y * viewport.height) / 2,
-        0
-      ),
-      0.2
+    targetVec.current.set(
+      (pointer.x * viewport.width) / 2,
+      (pointer.y * viewport.height) / 2,
+      0
     );
+    vec.current.lerp(targetVec.current, 0.2);
     ref.current.setNextKinematicTranslation(vec.current);
   });
 
