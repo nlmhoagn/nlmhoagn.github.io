@@ -5,12 +5,14 @@ import { eyebrowBoneNames, typingBoneNames } from "../../../data/boneData";
 const setAnimations = (gltf: GLTF) => {
   const character = gltf.scene;
   const mixer = new THREE.AnimationMixer(character);
+  let introAction: THREE.AnimationAction | null = null;
+  let blinkTimer: ReturnType<typeof setTimeout> | undefined;
   if (gltf.animations) {
     const introClip = gltf.animations.find(
       (clip) => clip.name === "introAnimation"
     );
     if (introClip) {
-      const introAction = mixer.clipAction(introClip);
+      introAction = mixer.clipAction(introClip);
       introAction.setLoop(THREE.LoopOnce, 1);
       introAction.clampWhenFinished = true;
     }
@@ -34,16 +36,11 @@ const setAnimations = (gltf: GLTF) => {
     }
   }
   function startIntro() {
-    const introClip = gltf.animations.find(
-      (clip) => clip.name === "introAnimation"
-    );
-    if (introClip) {
-      const introAction = mixer.clipAction(introClip);
-      introAction.setLoop(THREE.LoopOnce, 1);
-      introAction.clampWhenFinished = true;
+    if (introAction) {
       introAction.reset().play();
     }
-    setTimeout(() => {
+    clearTimeout(blinkTimer);
+    blinkTimer = setTimeout(() => {
       const blink = gltf.animations.find((clip) => clip.name === "Blink");
       if (blink) {
         mixer.clipAction(blink).play().fadeIn(0.5);
@@ -68,7 +65,7 @@ const setAnimations = (gltf: GLTF) => {
         isHovering = true;
         eyeBrowUpAction.reset();
         eyeBrowUpAction.enabled = true;
-        eyeBrowUpAction.setEffectiveWeight(4);
+        eyeBrowUpAction.setEffectiveWeight(1.4);
         eyeBrowUpAction.fadeIn(0.5).play();
       }
     };
@@ -86,7 +83,11 @@ const setAnimations = (gltf: GLTF) => {
       hoverDiv.removeEventListener("mouseleave", onLeaveFace);
     };
   }
-  return { mixer, startIntro, hover };
+  return {
+    mixer, startIntro, hover,
+    isIntroPlaying: () => introAction?.isRunning() ?? false,
+    dispose: () => { clearTimeout(blinkTimer); mixer.stopAllAction(); mixer.uncacheRoot(character); },
+  };
 };
 
 const createBoneAction = (

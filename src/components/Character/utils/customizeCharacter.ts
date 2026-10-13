@@ -1,23 +1,11 @@
 import * as THREE from "three";
+import { createLayeredHair } from "./layeredHair";
 
-/**
- * Customizes the 3D character to authentically match Hoang Nguyen:
- * 1. Radiant, warm, healthy Asian skin tone with 3D facial depth
- * 2. Solid minimalist long-sleeve shirt (ao tron tay dai nhu cu, khong chu, khong day chuyen):
- *    - Solid matte black / dark minimalist aesthetic
- * 3. Clean natural original haircut (bo luon mai di)
- * 4. Original animated eyes from GLTF model
- * 5. Realistic human-proportioned ears
- * 6. Fashionable oversized clear acetate glasses with silver rivets
- * 7. Polished sterling silver hoop earrings:
- *    - Left ear: 1st lobe, 2nd lobe, and snug outer-rim conch hoop
- *    - Right ear: 1st lobe
- * 8. Seamless, dense golden blonde mullet nape hair connecting directly to upper hair
- */
+/** Keeps the original rounded character and finishes its layered hair and accessories. */
 export function customizeCharacter(character: THREE.Object3D) {
   // 1. Color palette tailored to user's photo
-  const skinColor = new THREE.Color("#fff0e6"); // Fair, healthy, natural Asian skin tone
-  const skinEmissive = new THREE.Color("#ffdad0"); // Warm radiant Asian subsurface glow
+  const skinColor = new THREE.Color("#f1dacb");
+  const skinEmissive = new THREE.Color("#cfab94");
   const shirtColor = new THREE.Color("#1c1c20"); // Soft black plain long-sleeve shirt (lightened ~10%)
   const pantsColor = new THREE.Color("#182844"); // Deep dark blue indigo denim jeans
   const shoeColor = new THREE.Color("#dedbd4"); // Off-white cream sneakers
@@ -27,9 +15,9 @@ export function customizeCharacter(character: THREE.Object3D) {
 
   // 2. Refine eyebrow bones (sleek and natural)
   const browL = character.getObjectByName("eyebrow_L");
-  if (browL) browL.scale.set(0.70, 0.55, 0.70);
+  if (browL) { browL.scale.set(1, 1, 1); browL.add(createNaturalBrow(1, browColor)); }
   const browR = character.getObjectByName("eyebrow_R");
-  if (browR) browR.scale.set(0.70, 0.55, 0.70);
+  if (browR) { browR.scale.set(1, 1, 1); browR.add(createNaturalBrow(-1, browColor)); }
 
   // 3. Traverse all meshes and assign custom materials
   character.traverse((child) => {
@@ -46,10 +34,10 @@ export function customizeCharacter(character: THREE.Object3D) {
       ) {
         mesh.material = new THREE.MeshStandardMaterial({
           color: skinColor,
-          roughness: 0.44,
+          roughness: 0.62,
           metalness: 0.0,
           emissive: skinEmissive,
-          emissiveIntensity: 0.20,
+          emissiveIntensity: 0.025,
         });
       } else if (name.includes("Ear")) {
         // Completely hide the cartoon dumbo ears!
@@ -62,12 +50,19 @@ export function customizeCharacter(character: THREE.Object3D) {
           metalness: 0.02,
         });
       } else if (name.includes("hair") || name.includes("Hair")) {
+        mesh.visible = false;
         mesh.material = new THREE.MeshStandardMaterial({
           color: hairColor,
           roughness: 0.62,
           metalness: 0.04,
         });
+      } else if (name.startsWith("EYEs")) {
+        const material = (mesh.material as THREE.MeshStandardMaterial).clone();
+        if (material.map) material.map = createBrownEyeTexture(material.map);
+        material.roughness = 0.25;
+        mesh.material = material;
       } else if (name.includes("Eyebrow") || name.includes("eyebrow")) {
+        mesh.visible = false;
         mesh.material = new THREE.MeshStandardMaterial({
           color: browColor,
           roughness: 0.78,
@@ -101,10 +96,54 @@ export function customizeCharacter(character: THREE.Object3D) {
     character.getObjectByName("spine.006") ||
     character;
 
-  headBone.add(createRealisticEars(skinColor, skinEmissive));
+  const ears = createRealisticEars(skinColor, skinEmissive);
+  headBone.add(ears);
   headBone.add(createOversizedGlasses());
-  headBone.add(createEarrings());
+  const earrings = createEarrings();
+  headBone.add(earrings);
   headBone.add(createBlondeMulletNape());
+  headBone.add(createLayeredHair());
+}
+
+function createBrownEyeTexture(source: THREE.Texture): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = source.image.width;
+  canvas.height = source.image.height;
+  const context = canvas.getContext("2d")!;
+  context.drawImage(source.image, 0, 0);
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const r = pixels.data[i], g = pixels.data[i + 1], b = pixels.data[i + 2];
+    if (b > g * 1.3 && r > g * 1.2) {
+      const shade = (r + g + b) / 3;
+      pixels.data[i] = shade * 0.92;
+      pixels.data[i + 1] = shade * 0.68;
+      pixels.data[i + 2] = shade * 0.43;
+    }
+  }
+  context.putImageData(pixels, 0, 0);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.flipY = source.flipY;
+  texture.colorSpace = source.colorSpace;
+  texture.wrapS = source.wrapS;
+  texture.wrapT = source.wrapT;
+  return texture;
+}
+
+function createNaturalBrow(side: number, color: THREE.Color): THREE.Group {
+  const group = new THREE.Group();
+  group.name = `hoangBrow${side === 1 ? "L" : "R"}`;
+  group.position.set(0, -0.09, 0.075);
+  const shape = new THREE.Shape();
+  shape.moveTo(-0.28 * side, -0.006);
+  shape.quadraticCurveTo(-0.10 * side, 0.040, 0.09 * side, 0.034);
+  shape.quadraticCurveTo(0.23 * side, 0.022, 0.30 * side, -0.018);
+  shape.quadraticCurveTo(0.17 * side, -0.003, 0.06 * side, -0.010);
+  shape.quadraticCurveTo(-0.11 * side, -0.004, -0.28 * side, -0.035);
+  shape.closePath();
+  const mesh = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.005, bevelEnabled: true, bevelSize: 0.006, bevelThickness: 0.004, bevelSegments: 4, steps: 1, curveSegments: 24 }), new THREE.MeshStandardMaterial({ color, roughness: 0.88 }));
+  group.add(mesh);
+  return group;
 }
 
 /**
@@ -116,10 +155,10 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
 
   const earMat = new THREE.MeshStandardMaterial({
     color: skinColor,
-    roughness: 0.44,
+    roughness: 0.62,
     metalness: 0.0,
     emissive: skinEmissive,
-    emissiveIntensity: 0.20,
+    emissiveIntensity: 0.025,
     side: THREE.DoubleSide,
   });
 
@@ -127,7 +166,7 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
     const earGroup = new THREE.Group();
     const s = isLeft ? 1 : -1;
 
-    // Smooth C-curve for outer helix and earlobe:
+    // Use the same contour for the rim and its thin backing.
     const helixCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(s * 0.99, 1.25, 0.32), // Top attachment to temple
       new THREE.Vector3(s * 1.08, 1.28, 0.26), // Superior crest
@@ -137,22 +176,46 @@ function createRealisticEars(skinColor: THREE.Color, skinEmissive: THREE.Color):
       new THREE.Vector3(s * 1.02, 0.80, 0.28), // 1st Lobe bottom tip
       new THREE.Vector3(s * 0.99, 0.86, 0.30), // Lobe junction with jaw
     ]);
-    const helixGeo = new THREE.TubeGeometry(helixCurve, 24, 0.038, 8, false);
+    const helixGeo = new THREE.TubeGeometry(helixCurve, 40, 0.028, 16, false);
     earGroup.add(new THREE.Mesh(helixGeo, earMat));
 
-    // Inner concha / ear backing filling
-    const conchaShape = new THREE.Shape();
-    conchaShape.moveTo(0, 0.18);
-    conchaShape.quadraticCurveTo(0.12, 0.18, 0.15, 0.06);
-    conchaShape.quadraticCurveTo(0.16, -0.06, 0.09, -0.16);
-    conchaShape.quadraticCurveTo(0.00, -0.22, -0.04, -0.10);
-    conchaShape.lineTo(-0.04, 0.08);
-
-    const conchaGeo = new THREE.ShapeGeometry(conchaShape);
-    const conchaMesh = new THREE.Mesh(conchaGeo, earMat);
-    conchaMesh.position.set(s * 1.04, 1.04, 0.26);
-    conchaMesh.rotation.y = s * 0.26;
-    earGroup.add(conchaMesh);
+    const contour = helixCurve.getPoints(64);
+    const last = contour[contour.length - 1], first = contour[0];
+    for (let i = 1; i < 16; i++) contour.push(last.clone().lerp(first, i / 16));
+    const innerCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(s * 1.035, 1.22, 0),
+      new THREE.Vector3(s * 1.080, 1.16, 0),
+      new THREE.Vector3(s * 1.070, 1.07, 0),
+      new THREE.Vector3(s * 1.035, 0.98, 0),
+    ]).getPoints(32);
+    // Sculpt the cartilage into a shallow ear surface instead of a floating tube.
+    const center = new THREE.Vector3(s * 1.062, 1.055, 0.25);
+    const positions: number[] = [], indices: number[] = [];
+    const rings = 16, columns = contour.length;
+    for (let row = 0; row <= rings; row++) {
+      const radius = row / rings;
+      for (let column = 0; column <= columns; column++) {
+        const point = center.clone().lerp(contour[column % columns], radius);
+        const projected = new THREE.Vector3(point.x, point.y, 0);
+        const closest = innerCurve.reduce((best, candidate) => candidate.distanceToSquared(projected) < best.distanceToSquared(projected) ? candidate : best);
+        const distance = Math.hypot(point.x - closest.x, point.y - closest.y);
+        const fade = Math.sin(Math.PI * innerCurve.indexOf(closest) / 32);
+        point.z -= 0.003 + 0.008 * (1 - radius * radius);
+        point.z += 0.018 * Math.exp(-((distance / 0.023) ** 2)) * fade * Math.sin(Math.PI * radius);
+        positions.push(point.x, point.y, point.z);
+        if (row < rings && column < columns) {
+          const a = row * (columns + 1) + column;
+          indices.push(a, a + 1, a + columns + 1, a + 1, a + columns + 2, a + columns + 1);
+        }
+      }
+    }
+    const backing = new THREE.BufferGeometry();
+    backing.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    backing.setIndex(indices);
+    backing.computeVertexNormals();
+    const body = new THREE.Mesh(backing, earMat);
+    body.name = isLeft ? "hoangEarBodyL" : "hoangEarBodyR";
+    earGroup.add(body);
 
     return earGroup;
   }
@@ -174,12 +237,15 @@ function createOversizedGlasses(): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangGlasses";
 
-  const frameMat = new THREE.MeshStandardMaterial({
-    color: 0x9cb4d8,
+  const frameMat = new THREE.MeshPhysicalMaterial({
+    color: 0xede3d5,
     transparent: true,
-    opacity: 0.85,
-    roughness: 0.05,
-    metalness: 0.16,
+    opacity: 0.7,
+    transmission: 0.55,
+    thickness: 0.035,
+    ior: 1.46,
+    roughness: 0.12,
+    metalness: 0.0,
     depthWrite: true,
   });
 
@@ -200,9 +266,9 @@ function createOversizedGlasses(): THREE.Group {
     emissiveIntensity: 0.40,
   });
 
-  const rimWidth = 0.58;
-  const rimHeight = 0.46;
-  const rimThick = 0.034;
+  const rimWidth = 0.73;
+  const rimHeight = 0.50;
+  const rimThick = 0.020;
 
   function buildPantosRimGeometry() {
     const shape = new THREE.Shape();
@@ -273,54 +339,53 @@ function createOversizedGlasses(): THREE.Group {
   const lensGeo = makePantosLensGeometry();
 
   const leftRim = new THREE.Mesh(rimGeo, frameMat);
-  leftRim.position.set(0.38, 1.18, 1.13);
+  leftRim.position.set(0.41, 1.25, 1.19);
   leftRim.rotation.x = -0.04;
   group.add(leftRim);
 
   const leftLens = new THREE.Mesh(lensGeo, lensMat);
-  leftLens.position.set(0.38, 1.18, 1.145);
+  leftLens.position.set(0.41, 1.25, 1.205);
   leftLens.rotation.x = -0.04;
   group.add(leftLens);
 
   const rightRim = new THREE.Mesh(rimGeo, frameMat);
-  rightRim.position.set(-0.38, 1.18, 1.13);
+  rightRim.position.set(-0.41, 1.25, 1.19);
   rightRim.rotation.x = -0.04;
   group.add(rightRim);
 
   const rightLens = new THREE.Mesh(lensGeo, lensMat);
-  rightLens.position.set(-0.38, 1.18, 1.145);
+  rightLens.position.set(-0.41, 1.25, 1.205);
   rightLens.rotation.x = -0.04;
   group.add(rightLens);
 
   const bridgeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.11, 1.30, 1.14),
-    new THREE.Vector3(0.00, 1.34, 1.16),
-    new THREE.Vector3(0.11, 1.30, 1.14),
+    new THREE.Vector3(-0.06, 1.37, 1.20),
+    new THREE.Vector3(0.00, 1.40, 1.22),
+    new THREE.Vector3(0.06, 1.37, 1.20),
   ]);
   const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 14, 0.018, 8, false);
   group.add(new THREE.Mesh(bridgeGeo, frameMat));
 
-  const templeArmGeo = new THREE.BoxGeometry(0.024, 0.032, 0.95);
-
-  const leftArm = new THREE.Mesh(templeArmGeo, frameMat);
-  leftArm.position.set(0.66, 1.30, 0.65);
-  leftArm.rotation.y = -0.10;
-  group.add(leftArm);
-
-  const rightArm = new THREE.Mesh(templeArmGeo, frameMat);
-  rightArm.position.set(-0.66, 1.30, 0.65);
-  rightArm.rotation.y = 0.10;
-  group.add(rightArm);
+  for (const side of [-1, 1]) {
+    const arm = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.78, 1.38, 1.19),
+      new THREE.Vector3(side * 0.88, 1.37, 0.92),
+      new THREE.Vector3(side * 0.98, 1.31, 0.55),
+      new THREE.Vector3(side * 1.04, 1.17, 0.28),
+      new THREE.Vector3(side * 1.04, 1.02, 0.20),
+    ]);
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(arm, 32, 0.014, 12, false), frameMat));
+  }
 
   const pinGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.028, 8);
   const leftPin = new THREE.Mesh(pinGeo, silverRivetsMat);
   leftPin.rotation.x = Math.PI / 2;
-  leftPin.position.set(0.65, 1.33, 1.15);
+  leftPin.position.set(0.77, 1.40, 1.21);
   group.add(leftPin);
 
   const rightPin = new THREE.Mesh(pinGeo, silverRivetsMat);
   rightPin.rotation.x = Math.PI / 2;
-  rightPin.position.set(-0.65, 1.33, 1.15);
+  rightPin.position.set(-0.77, 1.40, 1.21);
   group.add(rightPin);
 
   return group;
@@ -377,280 +442,40 @@ function createEarrings(): THREE.Group {
   return group;
 }
 
-/**
- * Creates lush, dense, seamless golden blonde mullet nape hair:
- * - CONNECTS DIRECTLY TO THE UPPER BLACK HAIR MASS (tucked under the black hair rim from y = 1.28)
- * - Completely covers the skull and neck behind the ears, eliminating the split/gap
- * - Cascading fine-stranded wavy layers flowing over the collar
- */
+/** Continuous blonde mullet with shallow flowing ridges, outside the original skull. */
 function createBlondeMulletNape(): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangBlondeNape";
-
-  const goldenBlonde = new THREE.MeshStandardMaterial({
-    color: "#edbe3b",
-    roughness: 0.54,
-    metalness: 0.08,
-    side: THREE.DoubleSide,
-  });
-
-  const sunlitBlonde = new THREE.MeshStandardMaterial({
-    color: "#fad86b",
-    roughness: 0.50,
-    metalness: 0.10,
-    side: THREE.DoubleSide,
-  });
-
-  const lightWheatBlonde = new THREE.MeshStandardMaterial({
-    color: "#fae79d",
-    roughness: 0.48,
-    metalness: 0.08,
-    side: THREE.DoubleSide,
-  });
-
-  const richHoneyBlonde = new THREE.MeshStandardMaterial({
-    color: "#cf9223",
-    roughness: 0.60,
-    metalness: 0.06,
-    side: THREE.DoubleSide,
-  });
-
-  function makeLock(
-    points: THREE.Vector3[],
-    radius: number,
-    material: THREE.Material
-  ) {
-    const curve = new THREE.CatmullRomCurve3(points);
-    const geom = new THREE.TubeGeometry(curve, 22, radius, 8, false);
-    return new THREE.Mesh(geom, material);
-  }
-
-  // --- 0. SEAMLESS CONNECTING ROOT COLLAR ---
-  function buildConnectingCollar(): THREE.Mesh {
-    const uSegments = 24;
-    const vSegments = 8;
-    const geom = new THREE.BufferGeometry();
-    const positions: number[] = [];
-    const indices: number[] = [];
-
-    for (let iv = 0; iv <= vSegments; iv++) {
-      const v = iv / vSegments;
-      const y = 1.28 - v * 0.60;
-      const rx = 0.95 - v * 0.16;
-      const rz = 0.52 - v * 0.10;
-
-      for (let iu = 0; iu <= uSegments; iu++) {
-        const u = iu / uSegments;
-        const theta = -0.15 + u * (Math.PI + 0.30);
-        const x = Math.cos(theta) * rx;
-        const z = -Math.sin(theta) * rz;
-
-        positions.push(x, y, z);
+  const positions: number[] = [], colors: number[] = [], indices: number[] = [];
+  const columns = 96, rows = 40;
+  const honey = new THREE.Color("#cda02f"), wheat = new THREE.Color("#f1cb64");
+  for (let row = 0; row <= rows; row++) {
+    const v = row / rows;
+    for (let column = 0; column <= columns; column++) {
+      const theta = 0.025 + column / columns * (Math.PI - 0.05);
+      const phase = theta * 18 + 0.45 * Math.sin(v * Math.PI * 1.5);
+      const ridge = Math.pow(0.5 + 0.5 * Math.cos(phase), 3);
+      const radius = 0.026 * ridge * Math.sin(Math.PI * Math.min(1, v * 1.5));
+      const root = 1 - THREE.MathUtils.smoothstep(v, 0, 0.20);
+      const rx = 1.055 - 0.32 * v * v + radius - 0.07 * root;
+      const rz = 0.91 - 0.33 * v * v + radius - 0.10 * root;
+      const tip = 0.12 * Math.pow(v, 8) * (0.5 + 0.5 * Math.cos(theta * 18));
+      positions.push(Math.cos(theta) * rx, 1.28 - v * 1.55 + tip, -Math.sin(theta) * rz);
+      const color = honey.clone().lerp(wheat, 0.28 + 0.45 * ridge);
+      colors.push(color.r, color.g, color.b);
+      if (row < rows && column < columns) {
+        const a = row * (columns + 1) + column;
+        indices.push(a, a + 1, a + columns + 1, a + 1, a + columns + 2, a + columns + 1);
       }
     }
-
-    const stride = uSegments + 1;
-    for (let iv = 0; iv < vSegments; iv++) {
-      for (let iu = 0; iu < uSegments; iu++) {
-        const a = iv * stride + iu;
-        const b = (iv + 1) * stride + iu;
-        const c = a + 1;
-        const d = b + 1;
-
-        indices.push(a, b, c);
-        indices.push(c, b, d);
-      }
-    }
-
-    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geom.setIndex(indices);
-    geom.computeVertexNormals();
-
-    return new THREE.Mesh(geom, goldenBlonde);
   }
-
-  group.add(buildConnectingCollar());
-
-  // --- 1. LEFT SIDE CONNECTING & FLOWING MULLET WAVES ---
-  group.add(makeLock([
-    new THREE.Vector3(0.93, 1.28, 0.12),
-    new THREE.Vector3(0.96, 1.04, 0.08),
-    new THREE.Vector3(0.92, 0.76, 0.00),
-    new THREE.Vector3(0.82, 0.44, -0.08),
-    new THREE.Vector3(0.72, 0.10, -0.16),
-    new THREE.Vector3(0.66, -0.22, -0.20),
-  ], 0.030, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.88, 1.26, 0.04),
-    new THREE.Vector3(0.91, 1.00, -0.01),
-    new THREE.Vector3(0.87, 0.72, -0.08),
-    new THREE.Vector3(0.78, 0.40, -0.16),
-    new THREE.Vector3(0.69, 0.06, -0.22),
-    new THREE.Vector3(0.63, -0.25, -0.24),
-  ], 0.030, lightWheatBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.80, 1.24, -0.08),
-    new THREE.Vector3(0.83, 0.96, -0.12),
-    new THREE.Vector3(0.80, 0.66, -0.18),
-    new THREE.Vector3(0.73, 0.35, -0.24),
-    new THREE.Vector3(0.65, 0.02, -0.28),
-    new THREE.Vector3(0.59, -0.28, -0.28),
-  ], 0.032, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.70, 1.22, -0.18),
-    new THREE.Vector3(0.74, 0.92, -0.22),
-    new THREE.Vector3(0.72, 0.62, -0.26),
-    new THREE.Vector3(0.67, 0.30, -0.30),
-    new THREE.Vector3(0.60, -0.02, -0.32),
-    new THREE.Vector3(0.55, -0.30, -0.32),
-  ], 0.032, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.62, 1.20, -0.26),
-    new THREE.Vector3(0.66, 0.90, -0.30),
-    new THREE.Vector3(0.65, 0.58, -0.34),
-    new THREE.Vector3(0.61, 0.25, -0.36),
-    new THREE.Vector3(0.55, -0.06, -0.36),
-    new THREE.Vector3(0.50, -0.32, -0.34),
-  ], 0.034, richHoneyBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.84, 1.15, 0.02),
-    new THREE.Vector3(0.88, 0.86, -0.04),
-    new THREE.Vector3(0.83, 0.55, -0.12),
-    new THREE.Vector3(0.76, 0.22, -0.20),
-    new THREE.Vector3(0.70, -0.10, -0.24),
-  ], 0.028, lightWheatBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.52, 1.18, -0.34),
-    new THREE.Vector3(0.56, 0.86, -0.38),
-    new THREE.Vector3(0.55, 0.52, -0.42),
-    new THREE.Vector3(0.51, 0.20, -0.42),
-    new THREE.Vector3(0.45, -0.10, -0.40),
-  ], 0.034, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.40, 1.16, -0.40),
-    new THREE.Vector3(0.44, 0.82, -0.44),
-    new THREE.Vector3(0.45, 0.48, -0.46),
-    new THREE.Vector3(0.41, 0.16, -0.46),
-    new THREE.Vector3(0.36, -0.14, -0.42),
-  ], 0.032, richHoneyBlonde));
-
-  // --- 2. RIGHT SIDE CONNECTING & FLOWING MULLET WAVES ---
-  group.add(makeLock([
-    new THREE.Vector3(-0.93, 1.28, 0.12),
-    new THREE.Vector3(-0.96, 1.04, 0.08),
-    new THREE.Vector3(-0.92, 0.76, 0.00),
-    new THREE.Vector3(-0.82, 0.44, -0.08),
-    new THREE.Vector3(-0.72, 0.10, -0.16),
-    new THREE.Vector3(-0.66, -0.22, -0.20),
-  ], 0.030, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.88, 1.26, 0.04),
-    new THREE.Vector3(-0.91, 1.00, -0.01),
-    new THREE.Vector3(-0.87, 0.72, -0.08),
-    new THREE.Vector3(-0.78, 0.40, -0.16),
-    new THREE.Vector3(-0.69, 0.06, -0.22),
-    new THREE.Vector3(-0.63, -0.25, -0.24),
-  ], 0.030, lightWheatBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.80, 1.24, -0.08),
-    new THREE.Vector3(-0.83, 0.96, -0.12),
-    new THREE.Vector3(-0.80, 0.66, -0.18),
-    new THREE.Vector3(-0.73, 0.35, -0.24),
-    new THREE.Vector3(-0.65, 0.02, -0.28),
-    new THREE.Vector3(-0.59, -0.28, -0.28),
-  ], 0.032, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.70, 1.22, -0.18),
-    new THREE.Vector3(-0.74, 0.92, -0.22),
-    new THREE.Vector3(-0.72, 0.62, -0.26),
-    new THREE.Vector3(-0.67, 0.30, -0.30),
-    new THREE.Vector3(-0.60, -0.02, -0.32),
-    new THREE.Vector3(-0.55, -0.30, -0.32),
-  ], 0.032, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.62, 1.20, -0.26),
-    new THREE.Vector3(-0.66, 0.90, -0.30),
-    new THREE.Vector3(-0.65, 0.58, -0.34),
-    new THREE.Vector3(-0.61, 0.25, -0.36),
-    new THREE.Vector3(-0.55, -0.06, -0.36),
-    new THREE.Vector3(-0.50, -0.32, -0.34),
-  ], 0.034, richHoneyBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.84, 1.15, 0.02),
-    new THREE.Vector3(-0.88, 0.86, -0.04),
-    new THREE.Vector3(-0.83, 0.55, -0.12),
-    new THREE.Vector3(-0.76, 0.22, -0.20),
-    new THREE.Vector3(-0.70, -0.10, -0.24),
-  ], 0.028, lightWheatBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.52, 1.18, -0.34),
-    new THREE.Vector3(-0.56, 0.86, -0.38),
-    new THREE.Vector3(-0.55, 0.52, -0.42),
-    new THREE.Vector3(-0.51, 0.20, -0.42),
-    new THREE.Vector3(-0.45, -0.10, -0.40),
-  ], 0.034, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.40, 1.16, -0.40),
-    new THREE.Vector3(-0.44, 0.82, -0.44),
-    new THREE.Vector3(-0.45, 0.48, -0.46),
-    new THREE.Vector3(-0.41, 0.16, -0.46),
-    new THREE.Vector3(-0.36, -0.14, -0.42),
-  ], 0.032, richHoneyBlonde));
-
-  // --- 3. CENTER WATERFALL CASCADING DOWN NAPE & COLLAR ---
-  group.add(makeLock([
-    new THREE.Vector3(0.00, 1.20, -0.46),
-    new THREE.Vector3(0.00, 0.85, -0.52),
-    new THREE.Vector3(0.00, 0.45, -0.58),
-    new THREE.Vector3(0.00, 0.05, -0.58),
-    new THREE.Vector3(0.00, -0.32, -0.52),
-  ], 0.036, sunlitBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.12, 1.18, -0.44),
-    new THREE.Vector3(0.14, 0.82, -0.50),
-    new THREE.Vector3(0.15, 0.42, -0.55),
-    new THREE.Vector3(0.12, 0.02, -0.54),
-    new THREE.Vector3(0.08, -0.34, -0.48),
-  ], 0.034, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.12, 1.18, -0.44),
-    new THREE.Vector3(-0.14, 0.82, -0.50),
-    new THREE.Vector3(-0.15, 0.42, -0.55),
-    new THREE.Vector3(-0.12, 0.02, -0.54),
-    new THREE.Vector3(-0.08, -0.34, -0.48),
-  ], 0.034, goldenBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(0.24, 1.16, -0.42),
-    new THREE.Vector3(0.28, 0.78, -0.47),
-    new THREE.Vector3(0.28, 0.38, -0.51),
-    new THREE.Vector3(0.24, -0.02, -0.50),
-    new THREE.Vector3(0.18, -0.35, -0.44),
-  ], 0.032, richHoneyBlonde));
-
-  group.add(makeLock([
-    new THREE.Vector3(-0.24, 1.16, -0.42),
-    new THREE.Vector3(-0.28, 0.78, -0.47),
-    new THREE.Vector3(-0.28, 0.38, -0.51),
-    new THREE.Vector3(-0.24, -0.02, -0.50),
-    new THREE.Vector3(-0.18, -0.35, -0.44),
-  ], 0.032, richHoneyBlonde));
-
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0, side: THREE.DoubleSide }));
+  mesh.name = "hoangNapeBacking";
+  group.add(mesh);
   return group;
 }

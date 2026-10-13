@@ -35,6 +35,7 @@ const setCharacter = (
         loader.load(
           blobUrl,
           async (gltf) => {
+            URL.revokeObjectURL(blobUrl);
             const character = gltf.scene;
             customizeCharacter(character);
             scene.add(character);
@@ -63,6 +64,8 @@ const setCharacter = (
           },
           undefined,
           (error) => {
+            URL.revokeObjectURL(blobUrl);
+            dracoLoader.dispose();
             console.error("Error loading GLTF model:", error);
             resolve(null);
           }
