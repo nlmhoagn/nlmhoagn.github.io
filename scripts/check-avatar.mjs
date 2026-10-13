@@ -30,6 +30,10 @@ hair.traverse((object) => {
   assert.equal(positions.count, normals.count);
   for (const value of [...positions.array, ...normals.array]) assert(Number.isFinite(value), "Invalid hair geometry");
   for (const index of object.geometry.index.array) assert(index < positions.count, "Invalid triangle index");
+  const anchors = object.userData.scalpAnchors ?? [];
+  for (let i = 0; i < anchors.length; i += 4) {
+    assert(new THREE.Vector3().fromBufferAttribute(positions, anchors[i]).distanceTo(new THREE.Vector3(anchors[i + 1], anchors[i + 2], anchors[i + 3])) < 1e-6, "Hair lock has detached scalp edges");
+  }
   // The front UV seam must be closed even after applying the swept direction.
   if (object.name === "hoangLayeredScalp") {
     const uv = object.geometry.getAttribute("uv");
@@ -49,12 +53,25 @@ hair.traverse((object) => {
   triangles += object.geometry.index.count / 3;
 });
 assert(triangles < 40000, "Hair exceeds the intended geometry budget");
-assert.equal(hair.children.length, 1, "Black hair must be one continuous surface");
+assert.equal(hair.children.filter((object) => object.name === "hoangLayeredScalp").length, 1);
+assert.equal(hair.children.filter((object) => object.name.startsWith("hoangHairLock")).length, 12);
 
 const character = new THREE.Object3D();
 loadSource("../src/components/Character/utils/customizeCharacter.ts").customizeCharacter(character);
 const nape = character.getObjectByName("hoangBlondeNape");
 assert.equal(nape.children.length, 1, "Nape must have continuous coverage");
+const scalp = character.getObjectByName("hoangLayeredScalp");
+const scalpPositions = scalp.geometry.getAttribute("position"), scalpNormals = scalp.geometry.getAttribute("normal"), scalpUV = scalp.geometry.getAttribute("uv");
+const napePositions = nape.children[0].geometry.getAttribute("position"), napeNormals = nape.children[0].geometry.getAttribute("normal");
+const border = [];
+for (let i = 0; i < scalpUV.count; i++) {
+  if (scalpUV.getY(i) === 1 && scalpUV.getX(i) >= 0.25 && scalpUV.getX(i) <= 0.75) border.push(i);
+}
+border.forEach((vertex, column) => {
+  assert(new THREE.Vector3().fromBufferAttribute(scalpPositions, vertex).distanceTo(new THREE.Vector3().fromBufferAttribute(napePositions, column)) < 1e-6, "Gap between black hair and blonde roots");
+  assert(new THREE.Vector3().fromBufferAttribute(scalpNormals, vertex).distanceTo(new THREE.Vector3().fromBufferAttribute(napeNormals, column)) < 1e-6, "Broken shading at the nape join");
+});
+assert.equal(scalp.material.bumpMap, null, "Carbon-like strand texture must be removed");
 assert.equal(character.getObjectByName("hoangEarrings").children.length, 4);
 const ears = character.getObjectByName("hoangRealisticEars");
 ears.children.forEach((ear) => assert.equal(ear.children.length, 2, "Cartilage must be integrated into the ear backing"));
@@ -92,11 +109,21 @@ for (let i = 0; i < accessor.count; i++) {
   const offset = (view.byteOffset ?? 0) + (accessor.byteOffset ?? 0) + i * (view.byteStride ?? 12);
   const point = new THREE.Vector3(bin.readFloatLE(offset), bin.readFloatLE(offset + 4), bin.readFloatLE(offset + 8)).applyMatrix4(transform);
   if (point.z >= -0.05 || point.y > 1.28 || point.y < -0.15) continue;
-  const v = (1.28 - point.y) / 1.55;
-  const root = 1 - THREE.MathUtils.smoothstep(v, 0, 0.20);
-  const radiusX = 1.055 - 0.32 * v * v - 0.07 * root, radiusZ = 0.91 - 0.33 * v * v - 0.10 * root;
-  assert((point.x / radiusX) ** 2 + (point.z / radiusZ) ** 2 < 1, `Skull intersects the nape at ${point.toArray()}`);
-  covered++;
+  let theta = Math.atan2(point.x, point.z);
+  if (theta < 0) theta += Math.PI * 2;
+  const column = THREE.MathUtils.clamp((theta - Math.PI / 2) / Math.PI * (border.length - 1), 0, border.length - 1);
+  function surface(row) {
+    const first = row * border.length + Math.floor(column), last = row * border.length + Math.ceil(column);
+    return new THREE.Vector3().fromBufferAttribute(napePositions, first).lerp(new THREE.Vector3().fromBufferAttribute(napePositions, last), column % 1);
+  }
+  for (let row = 1; row < napePositions.count / border.length; row++) {
+    const top = surface(row - 1), bottom = surface(row);
+    if (point.y > top.y || point.y < bottom.y) continue;
+    const outer = top.lerp(bottom, (top.y - point.y) / (top.y - bottom.y));
+    assert(Math.hypot(point.x, point.z) < Math.hypot(outer.x, outer.z), `Skull intersects the actual nape at ${point.toArray()}`);
+    covered++;
+    break;
+  }
 }
 assert(covered > 100, "Rear skull coverage was not checked");
-console.log(`PASS: continuous hair (${vertices} vertices, ${triangles} triangles), ${covered} rear skull vertices covered, integrated ears, four earrings and head follow at 30/60/120 Hz.`);
+console.log(`PASS: attached crossing locks (${vertices} vertices, ${triangles} triangles), ${border.length} joined nape vertices and normals, ${covered} rear skull vertices covered, integrated ears, four earrings and head follow at 30/60/120 Hz.`);

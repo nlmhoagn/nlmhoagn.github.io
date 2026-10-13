@@ -101,8 +101,9 @@ export function customizeCharacter(character: THREE.Object3D) {
   headBone.add(createOversizedGlasses());
   const earrings = createEarrings();
   headBone.add(earrings);
-  headBone.add(createBlondeMulletNape());
-  headBone.add(createLayeredHair());
+  const hair = createLayeredHair();
+  headBone.add(createBlondeMulletNape(hair.getObjectByName("hoangLayeredScalp") as THREE.Mesh));
+  headBone.add(hair);
 }
 
 function createBrownEyeTexture(source: THREE.Texture): THREE.CanvasTexture {
@@ -443,29 +444,42 @@ function createEarrings(): THREE.Group {
 }
 
 /** Continuous blonde mullet with shallow flowing ridges, outside the original skull. */
-function createBlondeMulletNape(): THREE.Group {
+function createBlondeMulletNape(scalp: THREE.Mesh): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangBlondeNape";
   const positions: number[] = [], colors: number[] = [], indices: number[] = [];
-  const columns = 96, rows = 40;
+  const scalpPositions = scalp.geometry.getAttribute("position");
+  const scalpNormals = scalp.geometry.getAttribute("normal") as THREE.BufferAttribute;
+  const scalpUV = scalp.geometry.getAttribute("uv");
+  const border: number[] = [];
+  for (let i = 0; i < scalpUV.count; i++) {
+    if (scalpUV.getY(i) === 1 && scalpUV.getX(i) >= 0.25 && scalpUV.getX(i) <= 0.75) border.push(i);
+  }
+  const columns = border.length - 1, rows = 40;
   const honey = new THREE.Color("#cda02f"), wheat = new THREE.Color("#f1cb64");
   for (let row = 0; row <= rows; row++) {
     const v = row / rows;
     for (let column = 0; column <= columns; column++) {
-      const theta = 0.025 + column / columns * (Math.PI - 0.05);
+      const theta = Math.PI / 2 + column / columns * Math.PI;
+      const rootPoint = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column]);
       const phase = theta * 18 + 0.45 * Math.sin(v * Math.PI * 1.5);
       const ridge = Math.pow(0.5 + 0.5 * Math.cos(phase), 3);
       const radius = 0.026 * ridge * Math.sin(Math.PI * Math.min(1, v * 1.5));
-      const root = 1 - THREE.MathUtils.smoothstep(v, 0, 0.20);
-      const rx = 1.055 - 0.32 * v * v + radius - 0.07 * root;
-      const rz = 0.91 - 0.33 * v * v + radius - 0.10 * root;
       const tip = 0.12 * Math.pow(v, 8) * (0.5 + 0.5 * Math.cos(theta * 18));
-      positions.push(Math.cos(theta) * rx, 1.28 - v * 1.55 + tip, -Math.sin(theta) * rz);
+      const y = THREE.MathUtils.lerp(rootPoint.y, -0.27, v) + tip;
+      const height = (1.28 - y) / 1.55;
+      const rx = 1.055 - 0.32 * height * height + radius;
+      const rz = 0.91 - 0.33 * height * height + radius;
+      const rootHeight = (1.28 - rootPoint.y) / 1.55;
+      const rootX = Math.sin(theta) * (1.055 - 0.32 * rootHeight * rootHeight);
+      const rootZ = Math.cos(theta) * (0.91 - 0.33 * rootHeight * rootHeight);
+      const join = 1 - THREE.MathUtils.smoothstep(v, 0, 0.55);
+      positions.push(Math.sin(theta) * rx + (rootPoint.x - rootX) * join, y, Math.cos(theta) * rz + (rootPoint.z - rootZ) * join);
       const color = honey.clone().lerp(wheat, 0.28 + 0.45 * ridge);
       colors.push(color.r, color.g, color.b);
       if (row < rows && column < columns) {
         const a = row * (columns + 1) + column;
-        indices.push(a, a + 1, a + columns + 1, a + 1, a + columns + 2, a + columns + 1);
+        indices.push(a, a + columns + 1, a + 1, a + 1, a + columns + 1, a + columns + 2);
       }
     }
   }
@@ -474,6 +488,14 @@ function createBlondeMulletNape(): THREE.Group {
   geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
+  // The two colors share exact boundary positions and normals, so no inset shelf remains.
+  const normals = geometry.getAttribute("normal") as THREE.BufferAttribute;
+  for (let column = 0; column <= columns; column++) {
+    const normal = new THREE.Vector3().fromBufferAttribute(scalpNormals, border[column]).add(new THREE.Vector3().fromBufferAttribute(normals, column)).normalize();
+    normals.setXYZ(column, normal.x, normal.y, normal.z);
+    scalpNormals.setXYZ(border[column], normal.x, normal.y, normal.z);
+  }
+  scalpNormals.needsUpdate = true;
   const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0, side: THREE.DoubleSide }));
   mesh.name = "hoangNapeBacking";
   group.add(mesh);

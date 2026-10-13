@@ -4,9 +4,10 @@ The avatar keeps the original `public/models/character.enc` geometry,
 round face, eyelid morphs, 68-bone rig and 11 animation clips. The original
 clothing, blonde mullet color and four silver hoops are retained.
 
-`layeredHair.ts` creates a single scalp surface with swept relief and pointed
-fringe contours. Shared seam normals keep highlights continuous. The blonde
-nape uses one waved surface placed outside the original skull.
+`layeredHair.ts` creates a continuous scalp with raised, curved locks crossing
+over one another and returning to the scalp along their edges. The fringe is
+fuller and keeps its pointed contour. The blonde nape starts at the exact black
+hair boundary, sharing all 97 root positions and normals, then flows over the skull.
 `customizeCharacter.ts` adds warm skin, brown irises, softly bevelled brows
 and larger clear frames. Photographs are reference only; none is embedded
 in an asset or copied into the public folder.
@@ -35,6 +36,6 @@ smoothing state is separate from the animated pose. The intro retains
 control while playing. Touch, resize and hover listeners are cleaned up
 when the scene unmounts.
 
-`avatar:check` checks finite hair and ear geometry, continuous hair surfaces,
-the triangle budget, a closed front seam, 158 actual rear skull vertices inside
-the nape envelope, four earrings and head follow at 30/60/120 updates per second.
+`avatar:check` checks finite geometry, attached lock edges, the triangle budget,
+a closed front seam, matching nape boundary positions and normals, actual rear
+skull coverage, four earrings and head follow at 30/60/120 updates per second.
