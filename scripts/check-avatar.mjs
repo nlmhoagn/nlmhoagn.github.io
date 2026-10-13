@@ -10,7 +10,7 @@ function loadSource(path, window = {}) {
   const code = ts.transpileModule(readFileSync(new URL(path, import.meta.url), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
   const module = { exports: {} };
   const require = createRequire(import.meta.url);
-  runInNewContext(code, { module, exports: module.exports, require: (name) => name === "./layeredHair" ? loadSource("../src/components/Character/utils/layeredHair.ts") : require(name), window });
+  runInNewContext(code, { module, exports: module.exports, require: (name) => name === "./layeredHair" || name === "./monitorLogo" ? loadSource(`../src/components/Character/utils/${name.slice(2)}.ts`) : require(name), window });
   return module.exports;
 }
 
@@ -55,6 +55,27 @@ hair.traverse((object) => {
 assert(triangles < 40000, "Hair exceeds the intended geometry budget");
 assert.equal(hair.children.filter((object) => object.name === "hoangLayeredScalp").length, 1);
 assert.equal(hair.children.filter((object) => object.name.startsWith("hoangHairLock")).length, 12);
+
+const monitorFixture = new THREE.Group();
+monitorFixture.name = "Plane004";
+const monitorShell = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ name: "Material.027" }));
+monitorFixture.add(monitorShell);
+const addMonitorLogo = loadSource("../src/components/Character/utils/monitorLogo.ts").addMonitorLogo;
+const logo = addMonitorLogo(monitorFixture);
+assert.equal(logo.parent, monitorShell, "Logo must follow the animated monitor shell");
+logo.geometry.computeBoundingBox();
+assert(logo.geometry.boundingBox.getSize(new THREE.Vector3()).z < 0.004, "Logo should remain nearly flush");
+for (const value of [...logo.geometry.getAttribute("position").array, ...logo.geometry.getAttribute("normal").array]) assert(Number.isFinite(value));
+monitorShell.material.opacity = 0;
+logo.onBeforeRender();
+assert.equal(logo.material.opacity, 0, "Logo must disappear with the monitor");
+assert.equal(logo.material.depthWrite, false);
+monitorShell.material.opacity = 1;
+logo.onBeforeRender();
+assert.equal(logo.material.opacity, 1);
+assert.equal(logo.material.depthWrite, true);
+addMonitorLogo(monitorFixture);
+assert.equal(monitorShell.children.length, 1, "Logo must not be duplicated");
 
 const character = new THREE.Object3D();
 loadSource("../src/components/Character/utils/customizeCharacter.ts").customizeCharacter(character);

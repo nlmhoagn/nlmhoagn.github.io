@@ -22,6 +22,7 @@ const setCharacter = (
       : `${BASE_URL}draco/`;
   dracoLoader.setDecoderPath(dracoPath);
   loader.setDRACOLoader(dracoLoader);
+  let cancelled = false;
 
   const loadCharacter = async (): Promise<GLTF | null> => {
     try {
@@ -36,6 +37,13 @@ const setCharacter = (
           blobUrl,
           async (gltf) => {
             URL.revokeObjectURL(blobUrl);
+            if (envPromise) await envPromise.catch(() => null);
+            // A discarded React effect must not add a second scene after loading finishes.
+            if (cancelled) {
+              dracoLoader.dispose();
+              resolve(null);
+              return;
+            }
             const character = gltf.scene;
             customizeCharacter(character);
             scene.add(character);
@@ -47,9 +55,6 @@ const setCharacter = (
                 mesh.frustumCulled = true;
               }
             });
-            if (envPromise) {
-              await envPromise.catch(() => null);
-            }
             // Fully compile shaders and pre-warm GPU buffers with environment map
             renderer.compile(scene, camera);
             renderer.render(scene, camera);
@@ -77,7 +82,7 @@ const setCharacter = (
     }
   };
 
-  return { loadCharacter };
+  return { loadCharacter, cancelLoad: () => { cancelled = true; } };
 };
 
 export default setCharacter;

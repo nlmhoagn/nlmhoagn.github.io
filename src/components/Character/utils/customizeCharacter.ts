@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createLayeredHair } from "./layeredHair";
+import { addMonitorLogo } from "./monitorLogo";
 
 /** Keeps the original rounded character and finishes its layered hair and accessories. */
 export function customizeCharacter(character: THREE.Object3D) {
@@ -89,6 +90,8 @@ export function customizeCharacter(character: THREE.Object3D) {
       }
     }
   });
+
+  addMonitorLogo(character);
 
   // 4. Head Bone: Accessories & Hair
   const headBone =

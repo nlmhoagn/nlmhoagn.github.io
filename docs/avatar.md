@@ -15,6 +15,11 @@ in an asset or copied into the public folder.
 The forehead is covered by the scalp itself. Ear backing uses the exact rim
 contour with a shallow sculpted cartilage ridge, without a separate floating tube.
 
+`monitorLogo.ts` adds a nearly flush silver metal Apple mark to the monitor rear.
+It follows the shell's movement and fade, using the scene's existing lights and
+environment reflections. The silhouette comes from Font Awesome Free's Apple
+brand icon, available through react-icons, under [CC BY 4.0](https://fontawesome.com/license/free).
+
 ## Build and review
 
 ```sh

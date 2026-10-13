@@ -60,7 +60,7 @@ const Scene = () => {
 
       const light = setLighting(scene);
       const progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera, light.envPromise);
+      const { loadCharacter, cancelLoad } = setCharacter(renderer, scene, camera, light.envPromise);
 
       loadCharacter()
         .then((gltf) => {
@@ -158,6 +158,7 @@ const Scene = () => {
       const containerEl = canvasDiv.current;
       return () => {
         disposed = true;
+        cancelLoad();
         cancelAnimationFrame(animId);
         observer.disconnect();
         clearTimeout(introTimer);
