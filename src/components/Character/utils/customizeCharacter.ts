@@ -446,38 +446,93 @@ function createEarrings(): THREE.Group {
   return group;
 }
 
-/** Continuous blonde mullet with shallow flowing ridges, outside the original skull. */
+/** A separate black nape layer leaves the original crown and fringe untouched. */
 function createBlondeMulletNape(scalp: THREE.Mesh): THREE.Group {
   const group = new THREE.Group();
   group.name = "hoangBlondeNape";
-  const positions: number[] = [], colors: number[] = [], indices: number[] = [];
   const scalpPositions = scalp.geometry.getAttribute("position");
-  const scalpNormals = scalp.geometry.getAttribute("normal") as THREE.BufferAttribute;
-  const scalpUV = scalp.geometry.getAttribute("uv");
+  const scalpNormals = scalp.geometry.getAttribute("normal");
+  const uv = scalp.geometry.getAttribute("uv");
+  const stride = Math.round(1 / (uv.getX(1) - uv.getX(0))) + 1;
   const border: number[] = [];
-  for (let i = 0; i < scalpUV.count; i++) {
-    if (scalpUV.getY(i) === 1 && scalpUV.getX(i) >= 0.25 && scalpUV.getX(i) <= 0.75) border.push(i);
+  for (let i = 0; i < uv.count; i++) {
+    if (uv.getY(i) === 1 && uv.getX(i) >= 0.25 && uv.getX(i) <= 0.75) border.push(i);
   }
   const columns = border.length - 1, rows = 40;
+  function napePoint(column: number, v: number) {
+    const theta = Math.PI / 2 + column / columns * Math.PI;
+    const root = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column]);
+    const ridge = Math.pow(0.5 + 0.5 * Math.cos(theta * 18 + 0.45 * Math.sin(v * Math.PI * 1.5)), 3);
+    const radius = 0.026 * ridge * Math.sin(Math.PI * Math.min(1, v * 1.5));
+    const y = THREE.MathUtils.lerp(root.y, -0.27, v) + 0.12 * Math.pow(v, 8) * (0.5 + 0.5 * Math.cos(theta * 18));
+    const height = (1.28 - y) / 1.55, rootHeight = (1.28 - root.y) / 1.55;
+    const join = 1 - THREE.MathUtils.smoothstep(v, 0, 0.55);
+    return new THREE.Vector3(
+      Math.sin(theta) * (1.055 - 0.32 * height * height + radius) + (root.x - Math.sin(theta) * (1.055 - 0.32 * rootHeight * rootHeight)) * join,
+      y,
+      Math.cos(theta) * (0.91 - 0.33 * height * height + radius) + (root.z - Math.cos(theta) * (0.91 - 0.33 * rootHeight * rootHeight)) * join
+    );
+  }
+
+  const blackPositions: number[] = [], blackIndices: number[] = [];
+  const overlapRows = 8, blackRows = 32;
+  for (let row = 0; row <= blackRows; row++) {
+    for (let column = 0; column <= columns; column++) {
+      let point: THREE.Vector3;
+      if (row <= overlapRows) {
+        point = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column] - (overlapRows - row) * stride);
+        point.addScaledVector(new THREE.Vector3(point.x, 0, point.z).normalize(), THREE.MathUtils.lerp(-0.003, 0.003, row / overlapRows));
+      } else {
+        const theta = Math.PI / 2 + column / columns * Math.PI;
+        const phase = theta * 15 + 0.8 * Math.sin(theta * 3);
+        const tooth = 1 - Math.abs(Math.atan2(Math.sin(phase), Math.cos(phase))) / Math.PI;
+        const length = 0.30 + 0.20 * Math.sin(theta - Math.PI / 2) + 0.15 * Math.pow(tooth, 1.6);
+        const root = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column]);
+        const previous = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column] - stride);
+        const tangent = root.clone().sub(previous).normalize();
+        root.addScaledVector(new THREE.Vector3(root.x, 0, root.z).normalize(), 0.003);
+        const tip = napePoint(column, length);
+        tip.addScaledVector(new THREE.Vector3(tip.x, 0, tip.z).normalize(), 0.02);
+        const curve = new THREE.CubicBezierCurve3(root, root.clone().addScaledVector(tangent, root.distanceTo(tip) / 3), tip.clone().add(new THREE.Vector3(tip.x * 0.08, 0.20, tip.z * 0.08)), tip);
+        point = curve.getPoint((row - overlapRows) / (blackRows - overlapRows));
+      }
+      blackPositions.push(point.x, point.y, point.z);
+      if (row < blackRows && column < columns) {
+        const a = row * (columns + 1) + column;
+        blackIndices.push(a, a + columns + 1, a + 1, a + 1, a + columns + 1, a + columns + 2);
+      }
+    }
+  }
+  const blackGeometry = new THREE.BufferGeometry();
+  blackGeometry.setAttribute("position", new THREE.Float32BufferAttribute(blackPositions, 3));
+  blackGeometry.setIndex(blackIndices);
+  blackGeometry.computeVertexNormals();
+  const blackNormals = blackGeometry.getAttribute("normal") as THREE.BufferAttribute;
+  for (let row = 0; row <= overlapRows; row++) {
+    for (let column = 0; column <= columns; column++) {
+      const normal = new THREE.Vector3().fromBufferAttribute(scalpNormals, border[column] - (overlapRows - row) * stride);
+      blackNormals.setXYZ(row * (columns + 1) + column, normal.x, normal.y, normal.z);
+    }
+  }
+
+  const positions: number[] = [], colors: number[] = [], indices: number[] = [];
+  const blackSurface = blackGeometry.getAttribute("position");
   const honey = new THREE.Color("#cda02f"), wheat = new THREE.Color("#f1cb64");
   for (let row = 0; row <= rows; row++) {
     const v = row / rows;
     for (let column = 0; column <= columns; column++) {
       const theta = Math.PI / 2 + column / columns * Math.PI;
-      const rootPoint = new THREE.Vector3().fromBufferAttribute(scalpPositions, border[column]);
-      const phase = theta * 18 + 0.45 * Math.sin(v * Math.PI * 1.5);
-      const ridge = Math.pow(0.5 + 0.5 * Math.cos(phase), 3);
-      const radius = 0.026 * ridge * Math.sin(Math.PI * Math.min(1, v * 1.5));
-      const tip = 0.12 * Math.pow(v, 8) * (0.5 + 0.5 * Math.cos(theta * 18));
-      const y = THREE.MathUtils.lerp(rootPoint.y, -0.27, v) + tip;
-      const height = (1.28 - y) / 1.55;
-      const rx = 1.055 - 0.32 * height * height + radius;
-      const rz = 0.91 - 0.33 * height * height + radius;
-      const rootHeight = (1.28 - rootPoint.y) / 1.55;
-      const rootX = Math.sin(theta) * (1.055 - 0.32 * rootHeight * rootHeight);
-      const rootZ = Math.cos(theta) * (0.91 - 0.33 * rootHeight * rootHeight);
-      const join = 1 - THREE.MathUtils.smoothstep(v, 0, 0.55);
-      positions.push(Math.sin(theta) * rx + (rootPoint.x - rootX) * join, y, Math.cos(theta) * rz + (rootPoint.z - rootZ) * join);
+      const point = napePoint(column, v);
+      for (let blackRow = 1; blackRow <= blackRows; blackRow++) {
+        const upper = (blackRow - 1) * (columns + 1) + column, lower = blackRow * (columns + 1) + column;
+        const upperY = blackSurface.getY(upper), lowerY = blackSurface.getY(lower);
+        if (point.y > upperY || point.y < lowerY) continue;
+        point.copy(new THREE.Vector3().fromBufferAttribute(blackSurface, upper).lerp(new THREE.Vector3().fromBufferAttribute(blackSurface, lower), (upperY - point.y) / (upperY - lowerY)));
+        point.addScaledVector(new THREE.Vector3(point.x, 0, point.z).normalize(), -0.025);
+        break;
+      }
+      positions.push(point.x, point.y, point.z);
+      const ridge = Math.pow(0.5 + 0.5 * Math.cos(theta * 18 + 0.45 * Math.sin(v * Math.PI * 1.5)), 3);
       const color = honey.clone().lerp(wheat, 0.28 + 0.45 * ridge);
       colors.push(color.r, color.g, color.b);
       if (row < rows && column < columns) {
@@ -491,16 +546,11 @@ function createBlondeMulletNape(scalp: THREE.Mesh): THREE.Group {
   geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
-  // The two colors share exact boundary positions and normals, so no inset shelf remains.
-  const normals = geometry.getAttribute("normal") as THREE.BufferAttribute;
-  for (let column = 0; column <= columns; column++) {
-    const normal = new THREE.Vector3().fromBufferAttribute(scalpNormals, border[column]).add(new THREE.Vector3().fromBufferAttribute(normals, column)).normalize();
-    normals.setXYZ(column, normal.x, normal.y, normal.z);
-    scalpNormals.setXYZ(border[column], normal.x, normal.y, normal.z);
-  }
-  scalpNormals.needsUpdate = true;
-  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0, side: THREE.DoubleSide }));
-  mesh.name = "hoangNapeBacking";
-  group.add(mesh);
+  const backing = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0, side: THREE.DoubleSide }));
+  backing.name = "hoangNapeBacking";
+  group.add(backing);
+  const overlay = new THREE.Mesh(blackGeometry, scalp.material);
+  overlay.name = "hoangBlackNapeLayer";
+  group.add(overlay);
   return group;
 }

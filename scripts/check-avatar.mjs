@@ -80,17 +80,41 @@ assert.equal(monitorShell.children.length, 1, "Logo must not be duplicated");
 const character = new THREE.Object3D();
 loadSource("../src/components/Character/utils/customizeCharacter.ts").customizeCharacter(character);
 const nape = character.getObjectByName("hoangBlondeNape");
-assert.equal(nape.children.length, 1, "Nape must have continuous coverage");
+assert.equal(nape.children.length, 2, "Nape must have a blonde backing and a separate black layer");
 const scalp = character.getObjectByName("hoangLayeredScalp");
-const scalpPositions = scalp.geometry.getAttribute("position"), scalpNormals = scalp.geometry.getAttribute("normal"), scalpUV = scalp.geometry.getAttribute("uv");
-const napePositions = nape.children[0].geometry.getAttribute("position"), napeNormals = nape.children[0].geometry.getAttribute("normal");
+const scalpPositions = scalp.geometry.getAttribute("position"), scalpUV = scalp.geometry.getAttribute("uv");
+const napePositions = nape.children[0].geometry.getAttribute("position");
+const blackLayer = character.getObjectByName("hoangBlackNapeLayer");
+const blackPositions = blackLayer.geometry.getAttribute("position");
+const originalHair = hair;
+originalHair.children.forEach((original) => {
+  const actual = character.getObjectByName(original.name);
+  assert.deepEqual(actual.geometry.getAttribute("position").array, original.geometry.getAttribute("position").array, "Nape layer changed the original hair shape");
+  assert.deepEqual(actual.geometry.getAttribute("normal").array, original.geometry.getAttribute("normal").array, "Nape layer changed the original hair shading");
+});
 const border = [];
 for (let i = 0; i < scalpUV.count; i++) {
   if (scalpUV.getY(i) === 1 && scalpUV.getX(i) >= 0.25 && scalpUV.getX(i) <= 0.75) border.push(i);
 }
+const blackRows = blackPositions.count / border.length - 1;
 border.forEach((vertex, column) => {
-  assert(new THREE.Vector3().fromBufferAttribute(scalpPositions, vertex).distanceTo(new THREE.Vector3().fromBufferAttribute(napePositions, column)) < 1e-6, "Gap between black hair and blonde roots");
-  assert(new THREE.Vector3().fromBufferAttribute(scalpNormals, vertex).distanceTo(new THREE.Vector3().fromBufferAttribute(napeNormals, column)) < 1e-6, "Broken shading at the nape join");
+  for (let row = 0; row < napePositions.count / border.length; row++) {
+    const point = new THREE.Vector3().fromBufferAttribute(napePositions, row * border.length + column);
+    if (point.y < blackPositions.getY(blackRows * border.length + column)) continue;
+    let covered = false;
+    for (let blackRow = 1; blackRow <= blackRows; blackRow++) {
+      const upper = new THREE.Vector3().fromBufferAttribute(blackPositions, (blackRow - 1) * border.length + column);
+      const lower = new THREE.Vector3().fromBufferAttribute(blackPositions, blackRow * border.length + column);
+      if (point.y > upper.y || point.y < lower.y) continue;
+      const surface = upper.lerp(lower, (upper.y - point.y) / (upper.y - lower.y));
+      assert(Math.hypot(point.x, point.z) < Math.hypot(surface.x, surface.z) - 0.015, "Blonde backing penetrates the black nape layer");
+      covered = true;
+      break;
+    }
+    assert(covered, "Blonde roots extend above the black nape layer");
+  }
+  const blondeTip = napePositions.count - border.length + column;
+  assert(blackPositions.getY(blackRows * border.length + column) > napePositions.getY(blondeTip) + 0.2, "Black layer hides the blonde fringe entirely");
 });
 assert.equal(scalp.material.bumpMap, null, "Carbon-like strand texture must be removed");
 assert.equal(character.getObjectByName("hoangEarrings").children.length, 4);
@@ -147,4 +171,4 @@ for (let i = 0; i < accessor.count; i++) {
   }
 }
 assert(covered > 100, "Rear skull coverage was not checked");
-console.log(`PASS: attached crossing locks (${vertices} vertices, ${triangles} triangles), ${border.length} joined nape vertices and normals, ${covered} rear skull vertices covered, integrated ears, four earrings and head follow at 30/60/120 Hz.`);
+console.log(`PASS: attached crossing locks (${vertices} vertices, ${triangles} triangles), original hair unchanged, ${border.length} separate black nape columns with tucked blonde backing, ${covered} rear skull vertices covered, integrated ears, four earrings and head follow at 30/60/120 Hz.`);

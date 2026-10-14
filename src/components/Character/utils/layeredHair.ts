@@ -4,10 +4,10 @@ import * as THREE from "three";
 export function createLayeredHair(): THREE.Group {
   const hair = new THREE.Group();
   hair.name = "hoangLayeredHair";
-  const material = new THREE.MeshPhysicalMaterial({ color: "#1b191e", roughness: 0.76, clearcoat: 0.02, clearcoatRoughness: 0.7 });
+  const material = new THREE.MeshPhysicalMaterial({ color: "#18151b", roughness: 0.72, clearcoat: 0.08, clearcoatRoughness: 0.52 });
   const positions: number[] = [], uvs: number[] = [], indices: number[] = [];
   const rings = 64, columns = 192;
-  const hairline = [[0, 1.18], [0.16, 1.37], [0.26, 1.25], [0.39, 1.49], [0.53, 1.36], [0.65, 1.39], [0.86, 1.65], [1.04, 1.57], [1.23, 1.80], [1.57, 1.83], [2.1, 1.97], [Math.PI, 2.04]];
+  const hairline = [[0, 1.30], [0.16, 1.41], [0.26, 1.33], [0.39, 1.48], [0.53, 1.40], [0.65, 1.42], [0.86, 1.57], [1.04, 1.53], [1.23, 1.68], [1.57, 1.72], [2.1, 1.86], [Math.PI, 1.93]];
   const paths = [
     [[0.03, 0.12], [0.18, 0.45], [0.32, 0.83], [0.39, 1.49]],
     [[0.07, 0.17], [0.43, 0.55], [0.68, 1.0], [0.86, 1.65]],
@@ -82,12 +82,12 @@ export function createLayeredHair(): THREE.Group {
 
   // Broad curved locks cross over one another, with all four edges returning to the scalp.
   const locks = [
-    { points: [[0.025, 0.18], [0.12, 0.60], [0.34, 0.94], [0.39, 1.40]], width: 0.17, lift: 0.11 },
-    { points: [[0.15, 0.22], [0.36, 0.45], [0.72, 1.02], [0.81, 1.47]], width: 0.19, lift: 0.10 },
-    { points: [[0.60, 0.25], [0.90, 0.62], [1.15, 1.10], [1.23, 1.65]], width: 0.18, lift: 0.09 },
-    { points: [[0.50, 0.38], [0.58, 0.67], [0.26, 0.99], [0.18, 1.17]], width: 0.16, lift: 0.13 },
-    { points: [[0.98, 0.43], [0.99, 0.74], [0.62, 1.15], [0.69, 1.35]], width: 0.16, lift: 0.12 },
-    { points: [[1.15, 0.32], [1.55, 0.66], [1.76, 1.16], [1.85, 1.72]], width: 0.17, lift: 0.09 },
+    { points: [[0.025, 0.18], [0.12, 0.60], [0.34, 0.94], [0.39, 1.40]], width: 0.18, lift: 0.09 },
+    { points: [[0.15, 0.22], [0.36, 0.45], [0.72, 1.02], [0.81, 1.47]], width: 0.20, lift: 0.085 },
+    { points: [[0.60, 0.25], [0.90, 0.62], [1.15, 1.10], [1.23, 1.65]], width: 0.19, lift: 0.08 },
+    { points: [[0.50, 0.38], [0.58, 0.67], [0.26, 0.99], [0.18, 1.17]], width: 0.17, lift: 0.10 },
+    { points: [[0.98, 0.43], [0.99, 0.74], [0.62, 1.15], [0.69, 1.35]], width: 0.17, lift: 0.095 },
+    { points: [[1.15, 0.32], [1.55, 0.66], [1.76, 1.16], [1.85, 1.72]], width: 0.18, lift: 0.08 },
   ];
   for (const side of [-1, 1]) locks.forEach(({ points, width, lift }, index) => {
     const controls = points.map(([theta, phi]) => new THREE.Vector3(theta * side, phi, 0));
