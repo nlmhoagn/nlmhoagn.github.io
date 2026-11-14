@@ -128,3 +128,18 @@ body {
     font-size: 40px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  body .landing-h2-info-1, body .landing-h2-2 { display: none; }
+  body .what-box-in { display: flex; }
+  body .what-content-in { opacity: 1; }
+  body .what-border1 { max-width: 100%; }
+  body .what-border2 { max-height: 100%; }
+  body .character-model { position: absolute; }
+}

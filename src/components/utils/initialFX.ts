@@ -6,6 +6,7 @@ export function initialFX() {
   document.body.style.overflowY = "auto";
   smoother?.paused(false);
   const mainEl = document.getElementsByTagName("main")[0];
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (mainEl) mainEl.classList.add("main-active");
   gsap.to("body", {
     backgroundColor: "#0b080c",
@@ -25,11 +26,11 @@ export function initialFX() {
     { opacity: 0, y: 80, filter: "blur(5px)" },
     {
       opacity: 1,
-      duration: 1.2,
+      duration: 0.85,
       filter: "blur(0px)",
-      ease: "power3.inOut",
+      ease: "power3.out",
       y: 0,
-      stagger: 0.025,
+      stagger: 0.016,
       delay: 0.3,
     }
   );
@@ -42,11 +43,11 @@ export function initialFX() {
     { opacity: 0, y: 80, filter: "blur(5px)" },
     {
       opacity: 1,
-      duration: 1.2,
+      duration: 0.85,
       filter: "blur(0px)",
-      ease: "power3.inOut",
+      ease: "power3.out",
       y: 0,
-      stagger: 0.025,
+      stagger: 0.016,
       delay: 0.3,
     }
   );

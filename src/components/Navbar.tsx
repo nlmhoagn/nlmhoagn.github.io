@@ -25,21 +25,20 @@ const Navbar = () => {
     smoother.scrollTop(0);
     smoother.paused(true);
 
-    const links = document.querySelectorAll(".header ul a");
-    links.forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", (e) => {
-        if (window.innerWidth > 1024) {
-          e.preventDefault();
-          const elem = e.currentTarget as HTMLAnchorElement;
-          const section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
-        }
-      });
-    });
-    window.addEventListener("resize", () => {
-      ScrollSmoother.refresh(true);
-    });
+    const handleNavigation = (event: MouseEvent) => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>(".header ul a[data-href]");
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      smoother.scrollTo(link.getAttribute("data-href"));
+    };
+    const handleResize = () => ScrollSmoother.refresh();
+    document.addEventListener("click", handleNavigation);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      document.removeEventListener("click", handleNavigation);
+      window.removeEventListener("resize", handleResize);
+      smoother.kill();
+    };
   }, []);
   return (
     <>

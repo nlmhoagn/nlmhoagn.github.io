@@ -5,10 +5,7 @@ export function setCharTimeline(
   character: THREE.Object3D<THREE.Object3DEventMap> | null,
   camera: THREE.PerspectiveCamera
 ) {
-  let intensity: number = 0;
-  setInterval(() => {
-    intensity = Math.random();
-  }, 200);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const tl1 = gsap.timeline({
     scrollTrigger: {
       trigger: ".landing-section",
@@ -59,8 +56,9 @@ export function setCharTimeline(
         meshObj.material.transparent = true;
         meshObj.material.opacity = 0;
         meshObj.material.emissive.set("#C8BFFF");
+        gsap.killTweensOf(meshObj.material);
         gsap.timeline({ repeat: -1, repeatRefresh: true }).to(meshObj.material, {
-          emissiveIntensity: () => intensity * 8,
+          emissiveIntensity: () => Math.random() * 8,
           duration: () => Math.random() * 0.6,
           delay: () => Math.random() * 0.1,
         });
@@ -154,6 +152,7 @@ export function setCharTimeline(
 }
 
 export function setAllTimeline() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const careerBlocks = document.querySelectorAll(".career-block");
   careerBlocks.forEach((block) => {
     const timeline = block.querySelector(".career-timeline");

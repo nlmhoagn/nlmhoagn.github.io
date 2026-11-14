@@ -21,10 +21,10 @@ export class ScrollSmoother {
   constructor(_config?: ScrollSmootherConfig) {
     if (typeof window !== "undefined") {
       this.lenis = new Lenis({
-        lerp: 0.1,
+        lerp: 0.12,
         orientation: "vertical",
         gestureOrientation: "vertical",
-        smoothWheel: true,
+        smoothWheel: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
         wheelMultiplier: 1.0,
         touchMultiplier: 1.2,
       });
@@ -39,28 +39,10 @@ export class ScrollSmoother {
       gsap.ticker.add(this.tickerFn);
       gsap.ticker.lagSmoothing(0);
 
-      if (typeof ResizeObserver !== "undefined") {
-        this.resizeObserver = new ResizeObserver(() => {
-          this.lenis?.resize();
-          ScrollTrigger.refresh();
-        });
-        const target =
-          typeof _config?.content === "string"
-            ? document.querySelector(_config.content)
-            : _config?.content || document.getElementById("smooth-content") || document.body;
-        if (target) {
-          this.resizeObserver.observe(target);
-        }
-        if (document.body && document.body !== target) {
-          this.resizeObserver.observe(document.body);
-        }
-      }
 
       (window as unknown as { smoother: ScrollSmoother }).smoother = this;
     }
   }
-
-  private resizeObserver: ResizeObserver | null = null;
 
   static create(config?: ScrollSmootherConfig): ScrollSmoother {
     if (ScrollSmoother.instance) {
@@ -121,7 +103,7 @@ export class ScrollSmoother {
     if (dest) {
       if (this.lenis) {
         this.lenis.scrollTo(dest, {
-          immediate: !smooth,
+          immediate: !smooth || window.matchMedia("(prefers-reduced-motion: reduce)").matches,
           duration: smooth ? 1.2 : 0,
         });
       } else {
@@ -131,8 +113,6 @@ export class ScrollSmoother {
   }
 
   kill() {
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
     if (this.tickerFn) {
       gsap.ticker.remove(this.tickerFn);
     }
