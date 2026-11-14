@@ -1,0 +1,19 @@
+# Hoang Nguyen — Computer Engineering and Edge AI
+
+> Personal portfolio of a Computer Engineering undergraduate at HCMUT focused on edge AI, computer vision, multimodal retrieval and embedded systems.
+
+Use this site to understand Hoang Nguyen's research interests, technical skills and academic background, or to find contact details for research collaboration and recruitment. This is a portfolio, not an API: read the linked pages and use the published email address for inquiries. The full CV and project portfolio are currently private; request details directly rather than assuming access.
+
+## When to use this
+
+- Use the homepage summary for a concise overview of Hoang's focus areas and skills.
+- Use the about page for academic background and research interests.
+- Use the contact page to find public email addresses, phone number and professional profiles.
+- Use the privacy page for information about hosting, external services and contact.
+
+## Pages
+
+- [Homepage in Markdown](https://nlmhoagn.github.io/index.md): Overview and research interests.
+- [About](https://nlmhoagn.github.io/about/): Academic background and research interests.
+- [Contact](https://nlmhoagn.github.io/contact/): Contact details and profiles.
+- [Privacy](https://nlmhoagn.github.io/privacy/): Hosting and privacy information.

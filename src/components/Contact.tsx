@@ -66,6 +66,9 @@ const Contact = () => {
             >
               Instagram <MdArrowOutward />
             </a>
+            <a href="/about/" className="contact-social">About</a>
+            <a href="/contact/" className="contact-social">Contact information</a>
+            <a href="/privacy/" className="contact-social">Privacy</a>
             {!PRIVACY_CONFIG.hideResume && (
               <a
                 href="./resume.html"
